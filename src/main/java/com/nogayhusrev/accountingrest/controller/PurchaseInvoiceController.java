@@ -11,8 +11,6 @@ import com.nogayhusrev.accountingrest.service.InvoiceService;
 import com.nogayhusrev.accountingrest.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,9 +43,9 @@ public class PurchaseInvoiceController {
     @GetMapping("/{purchaseInvoiceId}")
     public ResponseEntity<ResponseWrapper> getInvoiceById(@PathVariable Long purchaseInvoiceId) {
 
-        InvoiceDto invoice = invoiceService.findById(purchaseInvoiceId);
+        InvoiceDto purchaseInvoice = invoiceService.findById(purchaseInvoiceId);
 
-        return ResponseEntity.ok(new ResponseWrapper("Invoice successfully retrieved", invoice, HttpStatus.OK));
+        return ResponseEntity.ok(new ResponseWrapper("Purchase Invoice successfully retrieved", purchaseInvoice, HttpStatus.OK));
     }
 
     @PostMapping
@@ -79,34 +77,34 @@ public class PurchaseInvoiceController {
     }
 
 
-    @DeleteMapping("/{invoiceId}")
-    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long invoiceId) {
+    @DeleteMapping("/{purchaseInvoiceId}")
+    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long purchaseInvoiceId) {
 
-        invoiceService.delete(invoiceId);
+        invoiceService.delete(purchaseInvoiceId);
 
         return ResponseEntity.ok(new ResponseWrapper("Purchase Invoice successfully deleted", HttpStatus.OK));
     }
 
-    @GetMapping("/approve/{invoiceId}")
-    public ResponseEntity<ResponseWrapper> approve(@PathVariable Long invoiceId) {
+    @GetMapping("/approve/{purchaseInvoiceId}")
+    public ResponseEntity<ResponseWrapper> approve(@PathVariable Long purchaseInvoiceId) {
 
-        invoiceService.approve(invoiceId);
+        invoiceService.approve(purchaseInvoiceId);
 
-        InvoiceDto invoiceDto = invoiceService.findById(invoiceId);
+        InvoiceDto invoiceDto = invoiceService.findById(purchaseInvoiceId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseWrapper("Invoice approved",invoiceDto, HttpStatus.OK));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseWrapper("Purchase Invoice approved", invoiceDto, HttpStatus.OK));
     }
 
 
-    @PostMapping("/addInvoiceProduct/{invoiceId}")
-    public ResponseEntity<ResponseWrapper> addInvoiceProductToPurchaseInvoice(@RequestBody InvoiceProductDto invoiceProductDto, @PathVariable Long invoiceId) {
+    @PostMapping("/addInvoiceProduct/{purchaseInvoiceId}")
+    public ResponseEntity<ResponseWrapper> addInvoiceProductToPurchaseInvoice(@RequestBody InvoiceProductDto invoiceProductDto, @PathVariable Long purchaseInvoiceId) {
 
 
-        invoiceProductService.saveInvoiceProductByInvoiceId(invoiceProductDto, invoiceId);
+        invoiceProductService.saveInvoiceProductByInvoiceId(invoiceProductDto, purchaseInvoiceId);
 
-        InvoiceDto invoiceDto = invoiceService.findById(invoiceId);
+        InvoiceDto invoiceDto = invoiceService.findById(purchaseInvoiceId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseWrapper("Invoice Products added",invoiceDto, HttpStatus.OK));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseWrapper("Purchase Invoice Products added", invoiceDto, HttpStatus.OK));
     }
 
 
