@@ -6,6 +6,8 @@ import com.nogayhusrev.accountingrest.dto.UserDto;
 import com.nogayhusrev.accountingrest.service.CompanyService;
 import com.nogayhusrev.accountingrest.service.RoleService;
 import com.nogayhusrev.accountingrest.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@Tag(name = "User", description = "User CRUD Operations")
 public class UserController {
 
     private final UserService userService;
@@ -29,12 +32,14 @@ public class UserController {
     }
 
     @GetMapping
+    @Operation(summary = "Read all users")
     public ResponseEntity<ResponseWrapper> list() throws Exception {
         List<UserDto> userDtoList = userService.findAll();
         return ResponseEntity.ok(new ResponseWrapper("Users are successfully retrieved", userDtoList, HttpStatus.OK));
     }
 
     @GetMapping("/{userId}")
+    @Operation(summary = "Read one user")
     public ResponseEntity<ResponseWrapper> list(@PathVariable Long userId) throws Exception {
         UserDto userDto = userService.findById(userId);
         return ResponseEntity.ok(new ResponseWrapper("User successfully retrieved", userDto, HttpStatus.OK));
@@ -42,6 +47,7 @@ public class UserController {
 
 
     @PostMapping
+    @Operation(summary = "Create an user")
     public ResponseEntity<ResponseWrapper> create(@RequestBody UserDto userDto) throws Exception {
 
         if (userService.isExist(userDto)) {
@@ -56,6 +62,7 @@ public class UserController {
 
 
     @PutMapping("/{userId}")
+    @Operation(summary = "Update an user")
     public ResponseEntity<ResponseWrapper> update(@RequestBody UserDto userDto, @PathVariable Long userId) throws Exception {
 
         if (userService.isExist(userDto, userId)) {
@@ -69,6 +76,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
+    @Operation(summary = "Delete an user")
     public ResponseEntity<ResponseWrapper> delete(@PathVariable Long userId) throws Exception {
 
         userService.delete(userId);

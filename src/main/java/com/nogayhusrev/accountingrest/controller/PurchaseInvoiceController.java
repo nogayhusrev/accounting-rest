@@ -3,19 +3,22 @@ package com.nogayhusrev.accountingrest.controller;
 
 import com.nogayhusrev.accountingrest.dto.InvoiceDto;
 import com.nogayhusrev.accountingrest.dto.InvoiceProductDto;
+import com.nogayhusrev.accountingrest.dto.ResponseWrapper;
 import com.nogayhusrev.accountingrest.enums.InvoiceType;
 import com.nogayhusrev.accountingrest.service.ClientVendorService;
 import com.nogayhusrev.accountingrest.service.InvoiceProductService;
 import com.nogayhusrev.accountingrest.service.InvoiceService;
 import com.nogayhusrev.accountingrest.service.ProductService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import java.util.List;
 
 @RestController
-@RequestMapping("/purchaseInvoices")
+@RequestMapping("/api/v1/purchaseInvoices")
 public class PurchaseInvoiceController {
 
     private final InvoiceService invoiceService;
@@ -32,102 +35,79 @@ public class PurchaseInvoiceController {
     }
 
 
-    @GetMapping("/list")
-    public String list(Model model) {
+    @GetMapping
+    public ResponseEntity<ResponseWrapper> list() throws Exception {
 
-        model.addAttribute("invoices", invoiceService.findPurchaseInvoices());
-
-        return "/invoice/purchase-invoice-list";
+        List<InvoiceDto> purchaseInvoices = invoiceService.findPurchaseInvoices();
+        return ResponseEntity.ok(new ResponseWrapper("Purchase Invoices are successfully retrieved", purchaseInvoices, HttpStatus.OK));
     }
 
+    @GetMapping("/{purchaseInvoiceId}")
+    public ResponseEntity<ResponseWrapper> getInvoiceById(@PathVariable Long purchaseInvoiceId) {
 
-    @GetMapping("/create")
-    public String create(Model model) {
+        InvoiceDto invoice = invoiceService.findById(purchaseInvoiceId);
 
-        model.addAttribute("newPurchaseInvoice", invoiceService.getNewInvoice(InvoiceType.PURCHASE));
-        model.addAttribute("vendors", invoiceService.findVendors());
-
-
-        return "/invoice/purchase-invoice-create";
-
+        return ResponseEntity.ok(new ResponseWrapper("Invoice successfully retrieved", invoice, HttpStatus.OK));
     }
 
-    @PostMapping("/create")
-    public String create(@Valid @ModelAttribute("newPurchaseInvoice") InvoiceDto invoiceDto, BindingResult bindingResult, Model model) {
+    @PostMapping
+    public ResponseEntity<ResponseWrapper> create(@RequestBody InvoiceDto invoiceDto) throws Exception {
 
-
-        if (bindingResult.hasErrors()) {
-
-            model.addAttribute("newPurchaseInvoice", invoiceService.getNewInvoice(InvoiceType.PURCHASE));
-            model.addAttribute("vendors", invoiceService.findVendors());
-
-            return "/invoice/purchase-invoice-create";
+        if (invoiceService.isExist(invoiceDto)) {
+            throw new Exception("This Invoice No already exists");
         }
 
-
+        invoiceDto.setInvoiceNo(invoiceService.generateInvoiceNo(InvoiceType.PURCHASE));
         invoiceService.save(invoiceDto, InvoiceType.PURCHASE);
+        InvoiceDto savedPurchaseInvoice = invoiceService.findByName(invoiceDto.getInvoiceNo());
 
-        return "redirect:/purchaseInvoices/list";
-
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper("Purchase Invoice successfully created", savedPurchaseInvoice, HttpStatus.CREATED));
     }
 
-    @GetMapping("/update/{invoiceId}")
-    public String update(@PathVariable("invoiceId") Long invoiceId, Model model) {
-
-        model.addAttribute("invoice", invoiceService.findById(invoiceId));
-        model.addAttribute("vendors", invoiceService.findVendors());
-
-        model.addAttribute("newInvoiceProduct", new InvoiceProductDto());
-
-        model.addAttribute("products", productService.findAll());
-        model.addAttribute("invoiceProducts", invoiceProductService.findInvoiceProductsByInvoiceId(invoiceId));
+    @PutMapping("/{purchaseInvoiceId}")
+    public ResponseEntity<ResponseWrapper> update(@RequestBody InvoiceDto invoiceDto, @PathVariable Long purchaseInvoiceId) throws Exception {
 
 
-        return "/invoice/purchase-invoice-update";
-
-    }
-
-    @PostMapping("/update/{invoiceId}")
-    public String update(@Valid @ModelAttribute("invoice") InvoiceDto invoiceDto, BindingResult bindingResult, @PathVariable Long invoiceId, Model model) {
-
-
-        if (bindingResult.hasErrors()) {
-
-            return "redirect:/purchaseInvoices/update/" + invoiceId;
+        if (invoiceService.isExist(invoiceDto, purchaseInvoiceId)) {
+            throw new Exception("This Purchase Invoice no already exists");
         }
 
-        invoiceService.update(invoiceDto, invoiceId);
-        return "redirect:/purchaseInvoices/list";
+        invoiceService.update(invoiceDto, purchaseInvoiceId);
+        InvoiceDto updatedPurchaseInvoice = invoiceService.findById(purchaseInvoiceId);
+
+        return ResponseEntity.ok(new ResponseWrapper("Purchase Invoice successfully updated", updatedPurchaseInvoice, HttpStatus.OK));
     }
 
-    @GetMapping("/delete/{invoiceId}")
-    public String delete(@PathVariable("invoiceId") Long invoiceId) {
+
+    @DeleteMapping("/{invoiceId}")
+    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long invoiceId) {
 
         invoiceService.delete(invoiceId);
 
-        return "redirect:/purchaseInvoices/list";
+        return ResponseEntity.ok(new ResponseWrapper("Purchase Invoice successfully deleted", HttpStatus.OK));
     }
 
     @GetMapping("/approve/{invoiceId}")
-    public String approve(@PathVariable("invoiceId") Long invoiceId) {
+    public ResponseEntity<ResponseWrapper> approve(@PathVariable Long invoiceId) {
 
         invoiceService.approve(invoiceId);
 
-        return "redirect:/purchaseInvoices/list";
+        InvoiceDto invoiceDto = invoiceService.findById(invoiceId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseWrapper("Invoice approved",invoiceDto, HttpStatus.OK));
     }
 
 
     @PostMapping("/addInvoiceProduct/{invoiceId}")
-    public String addInvoiceProductToPurchaseInvoice(@Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto invoiceProductDto, @PathVariable("invoiceId") Long invoiceId, BindingResult bindingResult, Model model) {
+    public ResponseEntity<ResponseWrapper> addInvoiceProductToPurchaseInvoice(@RequestBody InvoiceProductDto invoiceProductDto, @PathVariable Long invoiceId) {
 
-        if (bindingResult.hasErrors()) {
-
-            return "redirect:/purchaseInvoices/update/" + invoiceId;
-        }
 
         invoiceProductService.saveInvoiceProductByInvoiceId(invoiceProductDto, invoiceId);
 
-        return "redirect:/purchaseInvoices/update/" + invoiceId;
+        InvoiceDto invoiceDto = invoiceService.findById(invoiceId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseWrapper("Invoice Products added",invoiceDto, HttpStatus.OK));
     }
+
 
 }

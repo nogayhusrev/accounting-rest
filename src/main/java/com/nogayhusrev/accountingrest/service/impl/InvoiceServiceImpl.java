@@ -64,8 +64,12 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public InvoiceDto findByName(String name) {
-        throw new IllegalStateException("NOT IMPLEMENTED");
+    public InvoiceDto findByName(String invoiceNo) {
+        Invoice invoice = invoiceRepository.findAll().stream()
+                .filter(savedInvoice -> savedInvoice.getInvoiceNo().equals(invoiceNo))
+                .findFirst().get();
+
+        return mapperUtil.convert(invoice, new InvoiceDto());
     }
 
     @Override
@@ -120,20 +124,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public InvoiceDto getNewInvoice(InvoiceType invoiceType) {
-        InvoiceDto invoiceDto = new InvoiceDto();
-        invoiceDto.setInvoiceNo(generateInvoiceNo(invoiceType));
-        invoiceDto.setInvoiceType(invoiceType);
-        invoiceDto.setDate(LocalDate.now());
-        invoiceDto.setInvoiceProducts(new ArrayList<>());
-
-        return invoiceDto;
-    }
-
-    @Override
     public void save(InvoiceDto invoiceDto, InvoiceType invoiceType) {
         invoiceDto.setInvoiceType(invoiceType);
         invoiceDto.setInvoiceProducts(new ArrayList<>());
+        invoiceDto.setDate(LocalDate.now());
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         invoiceDto.setCompany(userService.getCurrentUser().getCompany());
         invoiceRepository.save(mapperUtil.convert(invoiceDto, new Invoice()));
@@ -190,6 +184,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoiceProductService.findInvoiceProductsByInvoiceId(invoiceId)
                 .forEach(invoiceProductDto -> invoiceProductService.delete(invoiceProductDto.getId()));
         invoice.setIsDeleted(true);
+        invoice.setInvoiceNo(invoice.getInvoiceNo() + "_DELETED");
         invoiceRepository.save(invoice);
     }
 
@@ -197,19 +192,28 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void update(InvoiceDto invoiceDto, Long invoiceId) {
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
-        invoice.setClientVendor(mapperUtil.convert(invoiceDto.getClientVendor(), new ClientVendor()));
-        invoiceRepository.save(invoice);
+
+        invoiceDto.setInvoiceNo(invoice.getInvoiceNo());
+
+        invoiceRepository.save(mapperUtil.convert(invoiceDto, new Invoice()));
 
     }
 
     @Override
-    public boolean isExist(InvoiceDto invoiceDto, Long aLong) {
-        throw new IllegalStateException("NOT IMPLEMENTED");
+    public boolean isExist(InvoiceDto invoiceDto, Long invoiceId) {
+        Long idCheck = invoiceRepository.findAll().stream()
+                .filter(savedInvoice -> savedInvoice.getInvoiceNo().equalsIgnoreCase(invoiceDto.getInvoiceNo()))
+                .filter(savedProduct -> savedProduct.getId() != invoiceId)
+                .count();
+
+        return idCheck > 0;
     }
 
     @Override
     public boolean isExist(InvoiceDto invoiceDto) {
-        throw new IllegalStateException("NOT IMPLEMENTED");
+        return invoiceRepository.findAll().stream()
+                .filter(savedInvoice -> savedInvoice.getInvoiceNo().equalsIgnoreCase(savedInvoice.getInvoiceNo()))
+                .count() > 0;
     }
 
     private void calculateInvoiceDetails(InvoiceDto invoiceDto) {
