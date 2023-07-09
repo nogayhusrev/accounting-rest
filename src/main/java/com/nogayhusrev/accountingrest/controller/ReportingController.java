@@ -1,14 +1,23 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
+import com.nogayhusrev.accountingrest.dto.CategoryDto;
+import com.nogayhusrev.accountingrest.dto.InvoiceProductDto;
+import com.nogayhusrev.accountingrest.dto.ResponseWrapper;
 import com.nogayhusrev.accountingrest.service.ReportingService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
 @Controller
-@RequestMapping("/reports")
+@RequestMapping("/api/v1/reports")
 public class ReportingController {
 
     private final ReportingService reportingService;
@@ -19,22 +28,21 @@ public class ReportingController {
 
 
     @GetMapping("/stock")
-    public String getStock(Model model) {
+    public ResponseEntity<ResponseWrapper> getStock() throws Exception {
 
-        model.addAttribute("invoiceProducts", reportingService.getStock());
-
-
-        return "/report/stock-report";
+        List<InvoiceProductDto> stock = reportingService.getStock();
+        return ResponseEntity.ok(new ResponseWrapper("Stock successfully retrieved", stock, HttpStatus.OK));
     }
 
     @GetMapping("/profitLoss")
-    public String getProfitLoss(Model model) {
+    public ResponseEntity<ResponseWrapper> getProfitLoss() throws Exception {
 
-        model.addAttribute("monthlyProfitLossDataMap", reportingService.getProfitLoss());
+        Map<String, BigDecimal> profitLoss = reportingService.getProfitLoss();
 
-
-        return "/report/profit-loss-report";
+        return ResponseEntity.ok(new ResponseWrapper("Profit/Loss successfully retrieved", profitLoss, HttpStatus.OK));
     }
+
+
 
     @GetMapping("/logs")
     public String getLogs(Model model) {
