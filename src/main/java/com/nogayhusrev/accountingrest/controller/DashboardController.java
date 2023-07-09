@@ -1,10 +1,10 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
-import com.accounting.service.CompanyService;
-import com.accounting.service.DashboardService;
-import com.accounting.service.InvoiceService;
-import com.accounting.service.UserService;
+import com.nogayhusrev.accountingrest.service.CompanyService;
+import com.nogayhusrev.accountingrest.service.DashboardService;
+import com.nogayhusrev.accountingrest.service.InvoiceService;
+import com.nogayhusrev.accountingrest.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

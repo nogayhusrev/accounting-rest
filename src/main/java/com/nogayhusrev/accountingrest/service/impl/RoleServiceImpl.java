@@ -54,6 +54,11 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    public RoleDto findByName(String name) {
+        throw new IllegalStateException("NOT IMPLEMENTED");
+    }
+
+    @Override
     public void save(RoleDto roleDto) {
         throw new IllegalStateException("Not Implemented");
 

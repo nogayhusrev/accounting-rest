@@ -64,6 +64,11 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    public InvoiceDto findByName(String name) {
+        throw new IllegalStateException("NOT IMPLEMENTED");
+    }
+
+    @Override
     public List<InvoiceDto> findPurchaseInvoices() {
         return findAll().stream()
                 .filter(invoice -> invoice.getInvoiceType().getValue().equals(InvoiceType.PURCHASE.getValue()))

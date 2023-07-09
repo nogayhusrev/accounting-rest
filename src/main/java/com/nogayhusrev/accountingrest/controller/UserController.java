@@ -1,10 +1,10 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
-import com.accounting.dto.UserDto;
-import com.accounting.service.CompanyService;
-import com.accounting.service.RoleService;
-import com.accounting.service.UserService;
+import com.nogayhusrev.accountingrest.dto.UserDto;
+import com.nogayhusrev.accountingrest.service.CompanyService;
+import com.nogayhusrev.accountingrest.service.RoleService;
+import com.nogayhusrev.accountingrest.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;

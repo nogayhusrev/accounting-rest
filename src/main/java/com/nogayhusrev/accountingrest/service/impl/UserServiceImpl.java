@@ -8,6 +8,7 @@ import com.nogayhusrev.accountingrest.mapper.MapperUtil;
 import com.nogayhusrev.accountingrest.repository.UserRepository;
 import com.nogayhusrev.accountingrest.service.SecurityService;
 import com.nogayhusrev.accountingrest.service.UserService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class UserServiceImpl implements UserService {
 
     private final SecurityService securityService;
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, SecurityService securityService) {
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder,@Lazy SecurityService securityService) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
         this.passwordEncoder = passwordEncoder;
@@ -67,6 +68,11 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
 
 
+    }
+
+    @Override
+    public UserDto findByName(String name) {
+        throw new IllegalStateException("NOT IMPLEMENTED");
     }
 
     @Override

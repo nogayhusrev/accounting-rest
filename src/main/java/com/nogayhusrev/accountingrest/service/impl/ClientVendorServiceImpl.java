@@ -45,6 +45,11 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     }
 
     @Override
+    public ClientVendorDto findByName(String name) {
+        throw new IllegalStateException("NOT IMPLEMENTED");
+    }
+
+    @Override
     public void save(ClientVendorDto clientVendorDto) {
 
         clientVendorDto.setCompany(userService.getCurrentUser().getCompany());

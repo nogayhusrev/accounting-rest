@@ -1,7 +1,7 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
-import com.accounting.service.ReportingService;
+import com.nogayhusrev.accountingrest.service.ReportingService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

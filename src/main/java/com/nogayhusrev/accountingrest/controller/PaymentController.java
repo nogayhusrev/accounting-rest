@@ -1,9 +1,9 @@
 package com.nogayhusrev.accountingrest.controller;
 
-import com.accounting.dto.PaymentDto;
-import com.accounting.entity.common.ChargeRequest;
-import com.accounting.service.PaymentService;
-import com.accounting.service.impl.StripeServiceImpl;
+import com.nogayhusrev.accountingrest.dto.PaymentDto;
+import com.nogayhusrev.accountingrest.entity.common.ChargeRequest;
+import com.nogayhusrev.accountingrest.service.PaymentService;
+import com.nogayhusrev.accountingrest.service.impl.StripeServiceImpl;
 import com.stripe.exception.StripeException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;

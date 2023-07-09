@@ -1,13 +1,13 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
-import com.accounting.dto.InvoiceDto;
-import com.accounting.dto.InvoiceProductDto;
-import com.accounting.enums.InvoiceType;
-import com.accounting.service.ClientVendorService;
-import com.accounting.service.InvoiceProductService;
-import com.accounting.service.InvoiceService;
-import com.accounting.service.ProductService;
+import com.nogayhusrev.accountingrest.dto.InvoiceDto;
+import com.nogayhusrev.accountingrest.dto.InvoiceProductDto;
+import com.nogayhusrev.accountingrest.enums.InvoiceType;
+import com.nogayhusrev.accountingrest.service.ClientVendorService;
+import com.nogayhusrev.accountingrest.service.InvoiceProductService;
+import com.nogayhusrev.accountingrest.service.InvoiceService;
+import com.nogayhusrev.accountingrest.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;

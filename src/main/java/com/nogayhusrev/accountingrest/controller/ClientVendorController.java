@@ -1,10 +1,10 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
-import com.accounting.dto.ClientVendorDto;
-import com.accounting.enums.ClientVendorType;
-import com.accounting.service.AddressService;
-import com.accounting.service.ClientVendorService;
+import com.nogayhusrev.accountingrest.dto.ClientVendorDto;
+import com.nogayhusrev.accountingrest.enums.ClientVendorType;
+import com.nogayhusrev.accountingrest.service.AddressService;
+import com.nogayhusrev.accountingrest.service.ClientVendorService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;

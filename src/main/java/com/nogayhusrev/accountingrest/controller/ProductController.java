@@ -1,10 +1,10 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
-import com.accounting.dto.ProductDto;
-import com.accounting.enums.ProductUnit;
-import com.accounting.service.CategoryService;
-import com.accounting.service.ProductService;
+import com.nogayhusrev.accountingrest.dto.ProductDto;
+import com.nogayhusrev.accountingrest.enums.ProductUnit;
+import com.nogayhusrev.accountingrest.service.CategoryService;
+import com.nogayhusrev.accountingrest.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;

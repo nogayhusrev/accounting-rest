@@ -1,96 +1,69 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
-import com.accounting.dto.CategoryDto;
-import com.accounting.service.CategoryService;
+import com.nogayhusrev.accountingrest.dto.CategoryDto;
+import com.nogayhusrev.accountingrest.dto.ResponseWrapper;
+import com.nogayhusrev.accountingrest.service.CategoryService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import java.util.List;
 
 @Controller
-@RequestMapping("/categories")
+@RequestMapping("/api/v1/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
+
 
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
-
-    @GetMapping("/list")
-    public String list(Model model) {
-
-        model.addAttribute("categories", categoryService.findAll());
-
-        return "/category/category-list";
+    @GetMapping
+    public ResponseEntity<ResponseWrapper> list() throws Exception {
+        List<CategoryDto> categoryList = categoryService.findAll();
+        return ResponseEntity.ok(new ResponseWrapper("Categories are successfully retrieved", categoryList, HttpStatus.OK));
     }
 
-
-    @GetMapping("/create")
-    public String create(Model model) {
-
-        model.addAttribute("newCategory", new CategoryDto());
-
-
-        return "/category/category-create";
-
-    }
-
-    @PostMapping("/create")
-    public String create(@Valid @ModelAttribute("newCategory") CategoryDto categoryDto, BindingResult bindingResult, Model model) {
+    @PostMapping
+    public ResponseEntity<ResponseWrapper> create(@RequestBody CategoryDto categoryDto) throws Exception {
 
         if (categoryService.isExist(categoryDto)) {
-            bindingResult.rejectValue("description", " ", "This category already exists.");
-        }
-
-
-        if (bindingResult.hasErrors()) {
-
-            model.addAttribute("newCategory", new CategoryDto());
-
-            return "/category/category-create";
+            throw new Exception("This category description already exists");
         }
 
         categoryService.save(categoryDto);
-
-        return "redirect:/categories/list";
-
+        CategoryDto savedCategory = categoryService.findByName(categoryDto.getDescription());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper("Category successfully created", savedCategory, HttpStatus.CREATED));
     }
 
-    @GetMapping("/update/{categoryId}")
-    public String update(@PathVariable("categoryId") Long categoryId, Model model) {
-
-        model.addAttribute("category", categoryService.findById(categoryId));
-
-
-        return "/category/category-update";
-
-    }
-
-    @PostMapping("/update/{categoryId}")
-    public String update(@Valid @ModelAttribute("category") CategoryDto categoryDto, BindingResult bindingResult, @PathVariable Long categoryId, Model model) throws CloneNotSupportedException {
+    @PutMapping("/{categoryId}")
+    public ResponseEntity<ResponseWrapper> update(@RequestBody CategoryDto categoryDto, @PathVariable Long categoryId) throws Exception {
+        categoryDto.setId(categoryId);
 
         if (categoryService.isExist(categoryDto, categoryId)) {
-            bindingResult.rejectValue("description", " ", "This category already exists.");
+            throw new Exception("This category description already exists");
         }
 
-        if (bindingResult.hasErrors()) {
+        categoryService.save(categoryDto);
+        CategoryDto updatedCategory = categoryService.findByName(categoryDto.getDescription());
 
-            return "redirect:/categories/update/" + categoryId;
-        }
-
-        categoryService.update(categoryDto, categoryId);
-        return "redirect:/categories/list";
+        return ResponseEntity.ok(new ResponseWrapper("Category successfully updated", updatedCategory, HttpStatus.OK));
     }
 
-    @GetMapping("/delete/{categoryId}")
-    public String delete(@PathVariable("categoryId") Long categoryId) {
+    @DeleteMapping("/{categoryId}")
+    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long categoryId) throws Exception {
+
+        if (categoryService.findById(categoryId).isHasProduct()) {
+            throw new Exception("This category has products.");
+        }
+
         categoryService.delete(categoryId);
-        return "redirect:/categories/list";
+        return ResponseEntity.ok(new ResponseWrapper("Category successfully deleted", HttpStatus.OK));
     }
+
 
 }

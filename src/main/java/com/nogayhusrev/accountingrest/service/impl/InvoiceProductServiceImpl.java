@@ -124,6 +124,11 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
+    public InvoiceProductDto findByName(String name) {
+        throw new IllegalStateException("NOT IMPLEMENTED");
+    }
+
+    @Override
     public void save(InvoiceProductDto invoiceProductDto) {
         invoiceProductRepository.save(mapperUtil.convert(invoiceProductDto, new InvoiceProduct()));
     }

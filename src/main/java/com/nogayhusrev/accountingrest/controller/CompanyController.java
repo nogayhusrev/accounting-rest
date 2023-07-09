@@ -1,20 +1,20 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
-import com.accounting.client.AddressClient;
-import com.accounting.dto.CompanyDto;
-import com.accounting.service.AddressService;
-import com.accounting.service.CompanyService;
+import com.nogayhusrev.accountingrest.client.AddressClient;
+import com.nogayhusrev.accountingrest.dto.CompanyDto;
+import com.nogayhusrev.accountingrest.dto.ResponseWrapper;
+import com.nogayhusrev.accountingrest.service.AddressService;
+import com.nogayhusrev.accountingrest.service.CompanyService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
-import javax.validation.Valid;
+import java.util.List;
 
 @Controller
-@RequestMapping("/companies")
+@RequestMapping("/api/v1/companies")
 public class CompanyController {
 
     private final CompanyService companyService;
@@ -27,84 +27,67 @@ public class CompanyController {
         this.addressClient = addressClient;
     }
 
-    @GetMapping("/list")
-    public String list(Model model) {
+    @GetMapping
+    public ResponseEntity<ResponseWrapper> list() throws Exception {
+        List<CompanyDto> companyDtoList = companyService.findAll();
+        return ResponseEntity.ok(new ResponseWrapper("Companies are successfully retrieved", companyDtoList, HttpStatus.OK));
+    }
 
-        model.addAttribute("companies", companyService.findAll());
-
-        return "/company/company-list";
+    @GetMapping("/{companyId}")
+    public ResponseEntity<ResponseWrapper> list(@PathVariable Long companyId) throws Exception {
+        CompanyDto companyDto = companyService.findById(companyId);
+        return ResponseEntity.ok(new ResponseWrapper("Company successfully retrieved", companyDto, HttpStatus.OK));
     }
 
 
-    @GetMapping("/create")
-    @RolesAllowed("Root")
-    public String create(Model model) {
-
-
-        model.addAttribute("newCompany", new CompanyDto());
-        model.addAttribute("countries", addressService.getAllCountries());
-
-        return "/company/company-create";
-
-    }
-
-    @PostMapping("/create")
-    public String create(@Valid @ModelAttribute("newCompany") CompanyDto companyDto, BindingResult bindingResult, Model model) {
+    @PostMapping
+    public ResponseEntity<ResponseWrapper> create(@RequestBody CompanyDto companyDto) throws Exception {
 
         if (companyService.isExist(companyDto)) {
-            bindingResult.rejectValue("title", " ", "This Company already exists.");
-        }
-
-
-        if (bindingResult.hasErrors()) {
-
-            model.addAttribute("newCompany", new CompanyDto());
-            model.addAttribute("countries", addressService.getAllCountries());
-
-            return "company/company-create";
+            throw new Exception("This Company title already exists");
         }
 
         companyService.save(companyDto);
-
-        return "redirect:/companies/list";
-
+        CompanyDto savedCompany = companyService.findByName(companyDto.getTitle());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper("Company successfully created", savedCompany, HttpStatus.CREATED));
     }
 
-    @GetMapping("/update/{companyId}")
-    public String update(@PathVariable("companyId") Long companyId, Model model) {
+    @PutMapping("/{companyId}")
+    public ResponseEntity<ResponseWrapper> update(@RequestBody CompanyDto companyDto, @PathVariable Long companyId) throws Exception {
 
-        model.addAttribute("company", companyService.findById(companyId));
-        model.addAttribute("countries", addressService.getAllCountries());
-        return "/company/company-update";
-
-    }
-
-    @PostMapping("/update/{companyId}")
-    public String update(@Valid @ModelAttribute("company") CompanyDto companyDto, BindingResult bindingResult, @PathVariable Long companyId) throws CloneNotSupportedException {
+        companyDto.setId(companyId);
 
         if (companyService.isExist(companyDto, companyId)) {
-            bindingResult.rejectValue("title", " ", "This title already exists.");
+            throw new Exception("This Company title already exists");
         }
 
-        if (bindingResult.hasErrors()) {
-
-
-            return "redirect:/companies/update/" + companyId;
-        }
-
-        companyService.update(companyDto, companyId);
-        return "redirect:/companies/list";
+        companyService.save(companyDto);
+        CompanyDto updatedCompany = companyService.findByName(companyDto.getTitle());
+        return ResponseEntity.ok(new ResponseWrapper("Company successfully updated", updatedCompany, HttpStatus.OK));
     }
 
-    @GetMapping("/activate/{companyId}")
-    public String activate(@PathVariable("companyId") Long companyId) {
+
+    @PutMapping("/activate/{companyId}")
+    public ResponseEntity<ResponseWrapper> activate(@PathVariable Long companyId) {
+
+
         companyService.activate(companyId);
-        return "redirect:/companies/list";
+
+        CompanyDto activatedCompany = companyService.findById(companyId);
+
+        return ResponseEntity.ok(new ResponseWrapper("Company successfully activated", activatedCompany, HttpStatus.OK));
     }
 
-    @GetMapping("/deactivate/{companyId}")
-    public String deactivate(@PathVariable("companyId") Long companyId) {
+
+    @PutMapping("/deactivate/{companyId}")
+    public ResponseEntity<ResponseWrapper> deactivate(@PathVariable Long companyId) {
+
+
         companyService.deactivate(companyId);
-        return "redirect:/companies/list";
+
+        CompanyDto activatedCompany = companyService.findById(companyId);
+
+        return ResponseEntity.ok(new ResponseWrapper("Company successfully deactivated", activatedCompany, HttpStatus.OK));
     }
+
 }

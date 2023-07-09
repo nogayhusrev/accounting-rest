@@ -43,6 +43,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ProductDto findByName(String name) {
+        throw new IllegalStateException("NOT IMPLEMENTED");
+    }
+
+    @Override
     public void save(ProductDto productDto) {
         Product product = mapperUtil.convert(productDto, new Product());
         product.setQuantityInStock(0);
