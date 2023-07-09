@@ -6,7 +6,6 @@ import com.nogayhusrev.accountingrest.dto.addressApi.CountryAndItsStatesPOSTRequ
 import com.nogayhusrev.accountingrest.dto.addressApi.CountryAndItsStatesPOSTResponse;
 import com.nogayhusrev.accountingrest.service.AddressService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

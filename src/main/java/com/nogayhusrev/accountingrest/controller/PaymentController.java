@@ -6,13 +6,12 @@ import com.nogayhusrev.accountingrest.service.PaymentService;
 import com.nogayhusrev.accountingrest.service.impl.StripeServiceImpl;
 import com.stripe.exception.StripeException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
-@Controller
+@RestController
 @RequestMapping("/payments")
 public class PaymentController {
 

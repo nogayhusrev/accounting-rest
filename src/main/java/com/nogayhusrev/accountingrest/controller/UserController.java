@@ -1,7 +1,6 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
-import com.nogayhusrev.accountingrest.dto.ProductDto;
 import com.nogayhusrev.accountingrest.dto.ResponseWrapper;
 import com.nogayhusrev.accountingrest.dto.UserDto;
 import com.nogayhusrev.accountingrest.service.CompanyService;
@@ -9,15 +8,11 @@ import com.nogayhusrev.accountingrest.service.RoleService;
 import com.nogayhusrev.accountingrest.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
 
@@ -80,9 +75,6 @@ public class UserController {
 
         return ResponseEntity.ok(new ResponseWrapper("User successfully deleted", HttpStatus.OK));
     }
-
-
-
 
 
 }

@@ -5,7 +5,6 @@ import com.nogayhusrev.accountingrest.dto.ClientVendorDto;
 import com.nogayhusrev.accountingrest.enums.ClientVendorType;
 import com.nogayhusrev.accountingrest.service.AddressService;
 import com.nogayhusrev.accountingrest.service.ClientVendorService;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +13,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@Controller
+@RestController
 @RequestMapping("/clientVendors")
 public class ClientVendorController {
 

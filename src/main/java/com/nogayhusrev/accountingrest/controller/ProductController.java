@@ -1,18 +1,16 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
-import com.nogayhusrev.accountingrest.dto.CategoryDto;
 import com.nogayhusrev.accountingrest.dto.ProductDto;
 import com.nogayhusrev.accountingrest.dto.ResponseWrapper;
 import com.nogayhusrev.accountingrest.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/api/v1/products")
 public class ProductController {
 

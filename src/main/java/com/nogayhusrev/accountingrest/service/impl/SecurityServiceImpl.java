@@ -36,7 +36,6 @@ public class SecurityServiceImpl implements SecurityService {
     public UserDto getCurrentUser() {
 
 
-
         return userService.findByUsername(managerUsername);
     }
 }

@@ -1,22 +1,21 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
-import com.nogayhusrev.accountingrest.dto.CategoryDto;
 import com.nogayhusrev.accountingrest.dto.InvoiceProductDto;
 import com.nogayhusrev.accountingrest.dto.ResponseWrapper;
 import com.nogayhusrev.accountingrest.service.ReportingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-@Controller
+@RestController
 @RequestMapping("/api/v1/reports")
 public class ReportingController {
 
@@ -41,7 +40,6 @@ public class ReportingController {
 
         return ResponseEntity.ok(new ResponseWrapper("Profit/Loss successfully retrieved", profitLoss, HttpStatus.OK));
     }
-
 
 
     @GetMapping("/logs")

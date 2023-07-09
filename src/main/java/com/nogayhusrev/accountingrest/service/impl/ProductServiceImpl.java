@@ -44,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto findByName(String name) {
-        Product product =  productRepository.findAll().stream()
+        Product product = productRepository.findAll().stream()
                 .filter(savedProduct -> savedProduct.getName().equalsIgnoreCase(name))
                 .findFirst().get();
 

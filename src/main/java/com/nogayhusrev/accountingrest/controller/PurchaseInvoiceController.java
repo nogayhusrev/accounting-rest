@@ -8,14 +8,13 @@ import com.nogayhusrev.accountingrest.service.ClientVendorService;
 import com.nogayhusrev.accountingrest.service.InvoiceProductService;
 import com.nogayhusrev.accountingrest.service.InvoiceService;
 import com.nogayhusrev.accountingrest.service.ProductService;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@Controller
+@RestController
 @RequestMapping("/purchaseInvoices")
 public class PurchaseInvoiceController {
 

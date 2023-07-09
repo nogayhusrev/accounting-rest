@@ -51,7 +51,7 @@ public class CompanyServiceImpl implements CompanyService {
                 .filter(savedCompany -> savedCompany.getTitle().equalsIgnoreCase(name))
                 .findFirst().get();
 
-        return mapperUtil.convert(company,new CompanyDto());
+        return mapperUtil.convert(company, new CompanyDto());
 
 
     }

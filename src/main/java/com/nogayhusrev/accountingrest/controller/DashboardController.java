@@ -1,15 +1,23 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
+import com.nogayhusrev.accountingrest.dto.ResponseWrapper;
 import com.nogayhusrev.accountingrest.service.CompanyService;
 import com.nogayhusrev.accountingrest.service.DashboardService;
 import com.nogayhusrev.accountingrest.service.InvoiceService;
 import com.nogayhusrev.accountingrest.service.UserService;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/v1")
 public class DashboardController {
 
     private final InvoiceService invoiceService;
@@ -24,17 +32,19 @@ public class DashboardController {
         this.userService = userService;
     }
 
-    @GetMapping("/dashboard")
-    public String getDashBoard(Model model) {
+    @GetMapping()
+    public ResponseEntity<ResponseWrapper> getDashBoard() {
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("companyTitle", userService.getCurrentUser().getCompany().getTitle());
+        map.put("summaryNumbers", dashboardService.getSummaryNumbers());
+        map.put("invoices", invoiceService.findLastThreeInvoices());
+        map.put("exchangeRates", dashboardService.getExchangeRates());
 
 
-        model.addAttribute("companyTitle", userService.getCurrentUser().getCompany().getTitle());
-        model.addAttribute("summaryNumbers", dashboardService.getSummaryNumbers());
-        model.addAttribute("invoices", invoiceService.findLastThreeInvoices());
-        model.addAttribute("exchangeRates", dashboardService.getExchangeRates());
-        model.addAttribute("title", "Ngy Accounting-Dashboard");
-        return "dashboard";
 
+        return ResponseEntity.ok(new ResponseWrapper("Dashboard successfully retrieved",map, HttpStatus.OK));
 
     }
 }
