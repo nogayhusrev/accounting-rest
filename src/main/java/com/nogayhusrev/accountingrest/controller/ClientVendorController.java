@@ -2,19 +2,17 @@ package com.nogayhusrev.accountingrest.controller;
 
 
 import com.nogayhusrev.accountingrest.dto.ClientVendorDto;
-import com.nogayhusrev.accountingrest.enums.ClientVendorType;
+import com.nogayhusrev.accountingrest.dto.ResponseWrapper;
 import com.nogayhusrev.accountingrest.service.AddressService;
 import com.nogayhusrev.accountingrest.service.ClientVendorService;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 @RestController
-@RequestMapping("/clientVendors")
+@RequestMapping("/api/v1/clientVendors")
 public class ClientVendorController {
 
     private final ClientVendorService clientVendorService;
@@ -25,80 +23,47 @@ public class ClientVendorController {
         this.addressService = addressService;
     }
 
-    @GetMapping("/list")
-    public String list(Model model) {
+    @GetMapping
+    public ResponseEntity<ResponseWrapper> list() throws Exception {
 
-        model.addAttribute("clientVendors", clientVendorService.findAll());
-
-        return "/clientVendor/clientVendor-list";
+        List<ClientVendorDto> clientVendorDtoList = clientVendorService.findAll();
+        return ResponseEntity.ok(new ResponseWrapper("Client-Vendors are successfully retrieved", clientVendorDtoList, HttpStatus.OK));
     }
 
-    @GetMapping("/create")
-    public String create(Model model) {
 
-
-        model.addAttribute("newClientVendor", new ClientVendorDto());
-        model.addAttribute("clientVendorTypes", new ArrayList<>(Arrays.asList(ClientVendorType.CLIENT, ClientVendorType.VENDOR)));
-        model.addAttribute("countries", addressService.getAllCountries());
-
-
-        return "/clientVendor/clientVendor-create";
-
-    }
-
-    @PostMapping("/create")
-    public String create(@Valid @ModelAttribute("newClientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult, Model model) {
+    @PostMapping
+    public ResponseEntity<ResponseWrapper> create(@RequestBody ClientVendorDto clientVendorDto) throws Exception {
 
         if (clientVendorService.isExist(clientVendorDto)) {
-            bindingResult.rejectValue("clientVendorName", " ", "This Name already exists.");
-        }
-
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("clientVendorTypes", new ArrayList<>(Arrays.asList(ClientVendorType.CLIENT, ClientVendorType.VENDOR)));
-            model.addAttribute("countries", addressService.getAllCountries());
-
-            return "/clientVendor/clientVendor-create";
+            throw new Exception("This Client-Vendor name already exists");
         }
 
         clientVendorService.save(clientVendorDto);
-
-        return "redirect:/clientVendors/list";
-
+        ClientVendorDto savedClientVendor = clientVendorService.findByName(clientVendorDto.getClientVendorName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper("Client-Vendor successfully created", savedClientVendor, HttpStatus.CREATED));
     }
 
-    @GetMapping("/update/{clientVendorId}")
-    public String update(@PathVariable("clientVendorId") Long clientVendorId, Model model) {
 
-        model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
-        model.addAttribute("clientVendorTypes", new ArrayList<>(Arrays.asList(ClientVendorType.CLIENT, ClientVendorType.VENDOR)));
-        model.addAttribute("countries", addressService.getAllCountries());
+    @PutMapping("/{clientVendorId}")
+    public ResponseEntity<ResponseWrapper> update(@RequestBody ClientVendorDto clientVendorDto, @PathVariable Long clientVendorId) throws Exception {
 
-
-        return "/clientVendor/clientVendor-update";
-
-    }
-
-    @PostMapping("/update/{clientVendorId}")
-    public String update(@Valid @ModelAttribute("clientVendorId") ClientVendorDto clientVendorDto, BindingResult bindingResult, @PathVariable Long clientVendorId) throws CloneNotSupportedException {
 
         if (clientVendorService.isExist(clientVendorDto, clientVendorId)) {
-            bindingResult.rejectValue("clientVendorName", " ", "This Name already exists.");
-        }
-
-        if (bindingResult.hasErrors()) {
-
-            return "redirect:/clientVendors/update/" + clientVendorId;
+            throw new Exception("This Client-Vendor name already exists");
         }
 
         clientVendorService.update(clientVendorDto, clientVendorId);
-        return "redirect:/clientVendors/list";
+        ClientVendorDto updatedClientVendor = clientVendorService.findById(clientVendorId);
+
+        return ResponseEntity.ok(new ResponseWrapper("Client-Vendor successfully updated", updatedClientVendor, HttpStatus.OK));
     }
 
-    @GetMapping("/delete/{clientVendorId}")
-    public String delete(@PathVariable("clientVendorId") Long clientVendorId) {
+    @DeleteMapping("/{clientVendorId}")
+    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long clientVendorId) throws Exception {
+
+
         clientVendorService.delete(clientVendorId);
-        return "redirect:/clientVendors/list";
+        return ResponseEntity.ok(new ResponseWrapper("Client-Vendor successfully deleted", HttpStatus.OK));
     }
 
 }
