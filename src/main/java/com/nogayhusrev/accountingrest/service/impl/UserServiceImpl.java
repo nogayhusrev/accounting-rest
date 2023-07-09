@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
 
     private final SecurityService securityService;
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder,@Lazy SecurityService securityService) {
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
         this.passwordEncoder = passwordEncoder;
@@ -71,8 +71,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto findByName(String name) {
-        throw new IllegalStateException("NOT IMPLEMENTED");
+    public UserDto findByName(String username) {
+        User user = userRepository.findAll().stream()
+                .filter(savedUser -> savedUser.getUsername().equalsIgnoreCase(username))
+                .findFirst().get();
+
+        return mapperUtil.convert(user, new UserDto());
     }
 
     @Override
@@ -86,8 +90,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(Long userId) {
+
+        UserDto userDto = findById(userId);
+
+        if (userDto.getRole().getDescription().equals("Admin") && adminCount(userDto) == 1)
+            throw new IllegalStateException("USER IS ONLY ADMIN, CANNOT BE DELETED");
+
         User user = userRepository.findById(userId).get();
         user.setUsername(user.getUsername() + "-" + user.getId() + " DELETED");
+
 
         user.setIsDeleted(true);
         userRepository.save(user);
@@ -97,7 +108,7 @@ public class UserServiceImpl implements UserService {
     public void update(UserDto userDto, Long userId) {
         User user = userRepository.findUserById(userId);
         userDto.setId(user.getId());
-        userRepository.save(mapperUtil.convert(user, new User()));
+        userRepository.save(mapperUtil.convert(userDto, new User()));
     }
 
     @Override

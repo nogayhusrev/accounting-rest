@@ -1,19 +1,24 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
+import com.nogayhusrev.accountingrest.dto.ProductDto;
+import com.nogayhusrev.accountingrest.dto.ResponseWrapper;
 import com.nogayhusrev.accountingrest.dto.UserDto;
 import com.nogayhusrev.accountingrest.service.CompanyService;
 import com.nogayhusrev.accountingrest.service.RoleService;
 import com.nogayhusrev.accountingrest.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     private final UserService userService;
@@ -28,78 +33,56 @@ public class UserController {
         this.companyService = companyService;
     }
 
-    @GetMapping("/list")
-    public String list(Model model) {
+    @GetMapping
+    public ResponseEntity<ResponseWrapper> list() throws Exception {
+        List<UserDto> userDtoList = userService.findAll();
+        return ResponseEntity.ok(new ResponseWrapper("Users are successfully retrieved", userDtoList, HttpStatus.OK));
+    }
 
-        model.addAttribute("users", userService.findAll());
-
-        return "/user/user-list";
+    @GetMapping("/{userId}")
+    public ResponseEntity<ResponseWrapper> list(@PathVariable Long userId) throws Exception {
+        UserDto userDto = userService.findById(userId);
+        return ResponseEntity.ok(new ResponseWrapper("User successfully retrieved", userDto, HttpStatus.OK));
     }
 
 
-    @GetMapping("/create")
-    public String create(Model model) {
-
-        model.addAttribute("newUser", new UserDto());
-        model.addAttribute("userRoles", roleService.getRolesForCurrentUser());
-        model.addAttribute("companies", companyService.getCompaniesForCurrentUser());
-
-        return "/user/user-create";
-
-    }
-
-    @PostMapping("/create")
-    public String create(@Valid @ModelAttribute("newUser") UserDto userDto, BindingResult bindingResult, Model model) {
+    @PostMapping
+    public ResponseEntity<ResponseWrapper> create(@RequestBody UserDto userDto) throws Exception {
 
         if (userService.isExist(userDto)) {
-            bindingResult.rejectValue("username", " ", "This username already exists.");
-        }
-
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("userRoles", roleService.getRolesForCurrentUser());
-            model.addAttribute("companies", companyService.getCompaniesForCurrentUser());
-
-            return "user/user-create";
+            throw new Exception("This username already exists");
         }
 
         userService.save(userDto);
+        UserDto savedUser = userService.findByName(userDto.getUsername());
 
-        return "redirect:/users/list";
-
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper("User successfully created", savedUser, HttpStatus.CREATED));
     }
 
-    @GetMapping("/update/{userId}")
-    public String update(@PathVariable Long userId, Model model) {
 
-        model.addAttribute("user", userService.findById(userId));
-        model.addAttribute("userRoles", roleService.getRolesForCurrentUser());
-        model.addAttribute("companies", companyService.getCompaniesForCurrentUser());
-
-        return "/user/user-update";
-
-    }
-
-    @PostMapping("/update/{userId}")
-    public String update(@Valid @ModelAttribute("user") UserDto userDto, BindingResult bindingResult, @PathVariable Long userId, Model model) throws CloneNotSupportedException {
+    @PutMapping("/{userId}")
+    public ResponseEntity<ResponseWrapper> update(@RequestBody UserDto userDto, @PathVariable Long userId) throws Exception {
 
         if (userService.isExist(userDto, userId)) {
-            bindingResult.rejectValue("username", " ", "This username already exists.");
-        }
-
-        if (bindingResult.hasErrors()) {
-            userDto.setId(userId);
-            return "redirect:/users/update/" + userId;
+            throw new Exception("This Product description already exists");
         }
 
         userService.update(userDto, userId);
-        return "redirect:/users/list";
+        UserDto updatedUser = userService.findById(userId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper("User successfully updated", updatedUser, HttpStatus.OK));
     }
 
-    @GetMapping("/delete/{userId}")
-    public String delete(@PathVariable("userId") Long userId) {
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long userId) throws Exception {
+
         userService.delete(userId);
-        return "redirect:/users/list";
+
+        return ResponseEntity.ok(new ResponseWrapper("User successfully deleted", HttpStatus.OK));
     }
+
+
+
+
 
 }
