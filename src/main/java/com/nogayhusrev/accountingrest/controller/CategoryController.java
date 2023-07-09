@@ -42,13 +42,13 @@ public class CategoryController {
 
     @PutMapping("/{categoryId}")
     public ResponseEntity<ResponseWrapper> update(@RequestBody CategoryDto categoryDto, @PathVariable Long categoryId) throws Exception {
-        categoryDto.setId(categoryId);
+
 
         if (categoryService.isExist(categoryDto, categoryId)) {
             throw new Exception("This category description already exists");
         }
 
-        categoryService.save(categoryDto);
+        categoryService.update(categoryDto, categoryId);
         CategoryDto updatedCategory = categoryService.findByName(categoryDto.getDescription());
 
         return ResponseEntity.ok(new ResponseWrapper("Category successfully updated", updatedCategory, HttpStatus.OK));

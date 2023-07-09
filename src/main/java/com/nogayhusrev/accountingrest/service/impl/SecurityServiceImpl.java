@@ -37,6 +37,6 @@ public class SecurityServiceImpl implements SecurityService {
 
 
 
-        return userService.findByUsername(rootUsername);
+        return userService.findByUsername(managerUsername);
     }
 }

@@ -44,7 +44,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto findByName(String name) {
-        throw new IllegalStateException("NOT IMPLEMENTED");
+        Product product =  productRepository.findAll().stream()
+                .filter(savedProduct -> savedProduct.getName().equalsIgnoreCase(name))
+                .findFirst().get();
+
+        return mapperUtil.convert(product, new ProductDto());
     }
 
     @Override

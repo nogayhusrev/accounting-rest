@@ -55,13 +55,12 @@ public class CompanyController {
     @PutMapping("/{companyId}")
     public ResponseEntity<ResponseWrapper> update(@RequestBody CompanyDto companyDto, @PathVariable Long companyId) throws Exception {
 
-        companyDto.setId(companyId);
 
         if (companyService.isExist(companyDto, companyId)) {
             throw new Exception("This Company title already exists");
         }
 
-        companyService.save(companyDto);
+        companyService.update(companyDto, companyId);
         CompanyDto updatedCompany = companyService.findByName(companyDto.getTitle());
         return ResponseEntity.ok(new ResponseWrapper("Company successfully updated", updatedCompany, HttpStatus.OK));
     }

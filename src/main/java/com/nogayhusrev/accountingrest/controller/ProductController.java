@@ -1,134 +1,77 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
+import com.nogayhusrev.accountingrest.dto.CategoryDto;
 import com.nogayhusrev.accountingrest.dto.ProductDto;
-import com.nogayhusrev.accountingrest.enums.ProductUnit;
-import com.nogayhusrev.accountingrest.service.CategoryService;
+import com.nogayhusrev.accountingrest.dto.ResponseWrapper;
 import com.nogayhusrev.accountingrest.service.ProductService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 @Controller
-@RequestMapping("/products")
+@RequestMapping("/api/v1/products")
 public class ProductController {
 
     private final ProductService productService;
 
-    private final CategoryService categoryService;
-
-    public ProductController(ProductService productService, CategoryService categoryService) {
+    public ProductController(ProductService productService) {
         this.productService = productService;
-        this.categoryService = categoryService;
     }
 
 
-    @GetMapping("/list")
-    public String list(Model model) {
+    @GetMapping
+    public ResponseEntity<ResponseWrapper> list() throws Exception {
+        List<ProductDto> productDtoList = productService.findAll();
+        return ResponseEntity.ok(new ResponseWrapper("Products are successfully retrieved", productDtoList, HttpStatus.OK));
+    }
 
-        model.addAttribute("products", productService.findAll());
-
-        return "/product/product-list";
+    @GetMapping("/{productId}")
+    public ResponseEntity<ResponseWrapper> list(@PathVariable Long productId) throws Exception {
+        ProductDto productDto = productService.findById(productId);
+        return ResponseEntity.ok(new ResponseWrapper("Product successfully retrieved", productDto, HttpStatus.OK));
     }
 
 
-    @GetMapping("/create")
-    public String create(Model model) {
-
-        model.addAttribute("newProduct", new ProductDto());
-        model.addAttribute("categories", categoryService.findAll());
-        model.addAttribute("productUnits", new ArrayList<>(Arrays.asList(
-                ProductUnit.KG,
-                ProductUnit.LBS,
-                ProductUnit.PCS,
-                ProductUnit.FEET,
-                ProductUnit.INCH,
-                ProductUnit.GALLON,
-                ProductUnit.METER
-        )));
-
-
-        return "/product/product-create";
-
-    }
-
-    @PostMapping("/create")
-    public String create(@Valid @ModelAttribute("newProduct") ProductDto productDto, BindingResult bindingResult, Model model) {
+    @PostMapping
+    public ResponseEntity<ResponseWrapper> create(@RequestBody ProductDto productDto) throws Exception {
 
         if (productService.isExist(productDto)) {
-            bindingResult.rejectValue("name", " ", "This product already exists.");
-        }
-
-
-        if (bindingResult.hasErrors()) {
-
-            model.addAttribute("newProduct", new ProductDto());
-            model.addAttribute("categories", categoryService.findAll());
-
-            model.addAttribute("productUnits", new ArrayList<>(Arrays.asList(
-                    ProductUnit.KG,
-                    ProductUnit.LBS,
-                    ProductUnit.PCS,
-                    ProductUnit.FEET,
-                    ProductUnit.INCH,
-                    ProductUnit.GALLON,
-                    ProductUnit.METER
-            )));
-
-            return "/product/product-create";
+            throw new Exception("This Product description already exists");
         }
 
         productService.save(productDto);
+        ProductDto savedProduct = productService.findByName(productDto.getName());
 
-        return "redirect:/products/list";
-
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper("Product successfully created", savedProduct, HttpStatus.CREATED));
     }
 
-    @GetMapping("/update/{productId}")
-    public String update(@PathVariable("productId") Long productId, Model model) {
 
-        model.addAttribute("product", productService.findById(productId));
-        model.addAttribute("categories", categoryService.findAll());
-        model.addAttribute("productUnits", new ArrayList<>(Arrays.asList(
-                ProductUnit.KG,
-                ProductUnit.LBS,
-                ProductUnit.PCS,
-                ProductUnit.FEET,
-                ProductUnit.INCH,
-                ProductUnit.GALLON,
-                ProductUnit.METER
-        )));
-
-
-        return "/product/product-update";
-
-    }
-
-    @PostMapping("/update/{productId}")
-    public String update(@Valid @ModelAttribute("product") ProductDto productDto, BindingResult bindingResult, @PathVariable Long productId, Model model) {
+    @PutMapping("/{productId}")
+    public ResponseEntity<ResponseWrapper> update(@RequestBody ProductDto productDto, @PathVariable Long productId) throws Exception {
 
         if (productService.isExist(productDto, productId)) {
-            bindingResult.rejectValue("name", " ", "This category already exists.");
-        }
-
-        if (bindingResult.hasErrors()) {
-
-            return "redirect:/products/update/" + productId;
+            throw new Exception("This Product description already exists");
         }
 
         productService.update(productDto, productId);
-        return "redirect:/products/list";
+        ProductDto updatedProduct = productService.findById(productId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper("Product successfully updated", updatedProduct, HttpStatus.OK));
     }
 
-    @GetMapping("/delete/{productId}")
-    public String delete(@PathVariable("productId") Long productId) {
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long productId) throws Exception {
+
+        if (productService.findById(productId).getQuantityInStock() > 0) {
+            throw new Exception("This Products has quantity in stock.");
+        }
+
         productService.delete(productId);
-        return "redirect:/products/list";
+        return ResponseEntity.ok(new ResponseWrapper("Product successfully deleted", HttpStatus.OK));
     }
 
 
