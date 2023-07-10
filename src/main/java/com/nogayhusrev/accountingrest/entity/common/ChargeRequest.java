@@ -1,8 +1,11 @@
 package com.nogayhusrev.accountingrest.entity.common;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChargeRequest {
     private String description;
     private int amount;

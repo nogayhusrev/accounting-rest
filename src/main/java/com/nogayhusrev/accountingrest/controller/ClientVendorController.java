@@ -1,6 +1,7 @@
 package com.nogayhusrev.accountingrest.controller;
 
 
+import com.nogayhusrev.accountingrest.dto.CategoryDto;
 import com.nogayhusrev.accountingrest.dto.ClientVendorDto;
 import com.nogayhusrev.accountingrest.dto.ResponseWrapper;
 import com.nogayhusrev.accountingrest.service.AddressService;
@@ -28,6 +29,12 @@ public class ClientVendorController {
 
         List<ClientVendorDto> clientVendorDtoList = clientVendorService.findAll();
         return ResponseEntity.ok(new ResponseWrapper("Client-Vendors are successfully retrieved", clientVendorDtoList, HttpStatus.OK));
+    }
+
+    @GetMapping("/{clientVendorId}")
+    public ResponseEntity<ResponseWrapper> list(@PathVariable Long clientVendorId) throws Exception {
+        ClientVendorDto clientVendorDto = clientVendorService.findById(clientVendorId);
+        return ResponseEntity.ok(new ResponseWrapper("Client-Vendor successfully retrieved", clientVendorDto, HttpStatus.OK));
     }
 
 

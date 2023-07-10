@@ -27,6 +27,12 @@ public class CategoryController {
         return ResponseEntity.ok(new ResponseWrapper("Categories are successfully retrieved", categoryList, HttpStatus.OK));
     }
 
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<ResponseWrapper> list(@PathVariable Long categoryId) throws Exception {
+        CategoryDto categoryDto = categoryService.findById(categoryId);
+        return ResponseEntity.ok(new ResponseWrapper("Category successfully retrieved", categoryDto, HttpStatus.OK));
+    }
+
     @PostMapping
     public ResponseEntity<ResponseWrapper> create(@RequestBody CategoryDto categoryDto) throws Exception {
 

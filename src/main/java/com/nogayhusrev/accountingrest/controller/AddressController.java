@@ -2,17 +2,18 @@ package com.nogayhusrev.accountingrest.controller;
 
 
 import com.nogayhusrev.accountingrest.client.AddressClient;
-import com.nogayhusrev.accountingrest.dto.addressApi.CountryAndItsStatesPOSTRequest;
-import com.nogayhusrev.accountingrest.dto.addressApi.CountryAndItsStatesPOSTResponse;
+import com.nogayhusrev.accountingrest.dto.ResponseWrapper;
+import com.nogayhusrev.accountingrest.dto.addressApi.CountriesAndStatesResponse;
 import com.nogayhusrev.accountingrest.service.AddressService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController()
-@RequestMapping("/addresses")
+@RequestMapping("/api/v1/addresses")
 public class AddressController {
 
     private final AddressService addressService;
@@ -23,14 +24,13 @@ public class AddressController {
         this.addressClient = addressClient;
     }
 
-    @PostMapping()
-    public ResponseEntity<CountryAndItsStatesPOSTResponse> list() {
-        CountryAndItsStatesPOSTRequest countryAndItsStatesPOSTRequest = new CountryAndItsStatesPOSTRequest();
-        countryAndItsStatesPOSTRequest.setCountry("Turkey");
-
-        CountryAndItsStatesPOSTResponse countryAndItsStatesPOSTResponse = addressClient.getCountryAndItsStatesPOSTResponse(countryAndItsStatesPOSTRequest);
-        return ResponseEntity.ok(countryAndItsStatesPOSTResponse);
+    @GetMapping
+    public ResponseEntity<ResponseWrapper> getCountries() throws Exception {
+        CountriesAndStatesResponse countriesAndStatesResponse = addressClient.getCountriesAndStatesGETResponse();
+        return ResponseEntity.ok(new ResponseWrapper("Countries and States are successfully retrieved", countriesAndStatesResponse, HttpStatus.OK));
     }
+
+
 
 
 }

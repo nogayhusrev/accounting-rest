@@ -1,18 +1,22 @@
 package com.nogayhusrev.accountingrest.controller;
 
 import com.nogayhusrev.accountingrest.dto.PaymentDto;
+import com.nogayhusrev.accountingrest.dto.ResponseWrapper;
 import com.nogayhusrev.accountingrest.entity.common.ChargeRequest;
 import com.nogayhusrev.accountingrest.service.PaymentService;
 import com.nogayhusrev.accountingrest.service.impl.StripeServiceImpl;
 import com.stripe.exception.StripeException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/payments")
+@RequestMapping("/api/v1/payments")
 public class PaymentController {
 
     private final StripeServiceImpl stripeServiceImpl;
@@ -27,38 +31,73 @@ public class PaymentController {
     }
 
 
-    @GetMapping({"/list", "/list/{year}"})
-    public String list(@RequestParam(value = "year", required = false) String selectedYear, Model model) {
+    @GetMapping()
+    public ResponseEntity<ResponseWrapper> list() {
 
-        int selectedYear1 = (selectedYear == null || selectedYear.isEmpty()) ? LocalDate.now().getYear() : Integer.parseInt(selectedYear);
-        paymentService.createPaymentsIfNotExist(selectedYear1);
-        model.addAttribute("payments", paymentService.getAllPaymentsByYear(selectedYear1));
-        model.addAttribute("year", selectedYear1);
-        return "payment/payment-list";
+        int year = LocalDate.now().getYear();
+
+        paymentService.createPaymentsIfNotExist(year);
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("payments", paymentService.getAllPaymentsByYear(year));
+        map.put("year", year);
+        return ResponseEntity.ok(new ResponseWrapper("Payments are successfully retrieved", map, HttpStatus.OK));
+    }
+
+    @GetMapping("/{year}")
+    public ResponseEntity<ResponseWrapper> list(@PathVariable String year) {
+
+        int selectedYear = (year == null || year.isEmpty()) ? LocalDate.now().getYear() : Integer.parseInt(year);
+
+        if (selectedYear < 2000 || selectedYear > 2100)
+            throw new IllegalStateException("********* ====>>> YEAR NOT VALID <<<==== ********* ");
+
+        paymentService.createPaymentsIfNotExist(selectedYear);
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("payments", paymentService.getAllPaymentsByYear(selectedYear));
+        map.put("year", selectedYear);
+        return ResponseEntity.ok(new ResponseWrapper("Payments are successfully retrieved", map, HttpStatus.OK));
     }
 
 
-    @GetMapping("/newpayment/{id}")
-    public String checkout(@PathVariable("id") Long id, Model model) {
+    @GetMapping("/newPayment/{paymentId}")
+    public ResponseEntity<ResponseWrapper> list(@PathVariable Long paymentId) {
 
-        PaymentDto dto = paymentService.getPaymentById(id);
-        model.addAttribute("payment", dto);
-        model.addAttribute("amount", dto.getAmount() * 100); // in cents
-        model.addAttribute("stripePublicKey", stripePublicKey);
-        model.addAttribute("currency", ChargeRequest.Currency.EUR);
-        model.addAttribute("modelId", id);
-        return "payment/payment-method";
+        PaymentDto payment = paymentService.getPaymentById(paymentId);
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("payment", payment);
+        map.put("amount", payment.getAmount() * 100); //in cents
+        map.put("stripePublicKey", stripePublicKey);
+        map.put("currency", ChargeRequest.Currency.EUR);
+        map.put("modelId", paymentId);
+
+
+        return ResponseEntity.ok(new ResponseWrapper("Payment successfully retrieved", map, HttpStatus.OK));
     }
 
 
-    @PostMapping("/charge/{id}")
-    public String charge(ChargeRequest chargeRequest, @PathVariable("id") Long id, Model model)
+    @PostMapping("/charge/{paymentId}")
+    public ResponseEntity<ResponseWrapper> charge(@RequestBody ChargeRequest chargeRequest, @PathVariable Long paymentId)
             throws StripeException {
+
+        Map<String, Object> map = new HashMap<>();
+
+
         chargeRequest.setDescription("Example charge");
         chargeRequest.setCurrency(ChargeRequest.Currency.EUR);
+
         stripeServiceImpl.charge(chargeRequest);
-        paymentService.updatePayment(id);
-        return "redirect:/payments/list";
+        paymentService.payPayment(paymentId);
+
+        map.put("chargedPayment", chargeRequest);
+
+
+        return ResponseEntity.ok(new ResponseWrapper("Payment successfully charged", map, HttpStatus.OK));
     }
 
 

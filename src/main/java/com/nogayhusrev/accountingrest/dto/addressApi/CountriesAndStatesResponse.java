@@ -21,7 +21,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CountriesAndStatesGETResponse {
+public class CountriesAndStatesResponse {
 
     @JsonProperty("error")
     public Boolean error;
