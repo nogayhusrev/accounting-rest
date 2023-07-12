@@ -5,6 +5,10 @@ import com.nogayhusrev.accounting_rest.dto.ClientVendorDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
 import com.nogayhusrev.accounting_rest.service.AddressService;
 import com.nogayhusrev.accounting_rest.service.ClientVendorService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +31,13 @@ public class ClientVendorController {
     }
 
     @GetMapping
+    @Operation(summary = "Read all Client-Vendors")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Client-Vendors (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> list() throws Exception {
 
         List<ClientVendorDto> clientVendorDtoList = clientVendorService.findAll();
@@ -34,6 +45,13 @@ public class ClientVendorController {
     }
 
     @GetMapping("/{clientVendorId}")
+    @Operation(summary = "Read one Client-Vendor")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Client-Vendor (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> list(@PathVariable Long clientVendorId) throws Exception {
         ClientVendorDto clientVendorDto = clientVendorService.findById(clientVendorId);
         return ResponseEntity.ok(new ResponseWrapper("Client-Vendor successfully retrieved", clientVendorDto, HttpStatus.OK));
@@ -41,6 +59,13 @@ public class ClientVendorController {
 
 
     @PostMapping
+    @Operation(summary = "Create a Client-Vendor")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully created Client-Vendor (CREATED)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> create(@RequestBody ClientVendorDto clientVendorDto) throws Exception {
 
         if (clientVendorService.isExist(clientVendorDto)) {
@@ -54,6 +79,13 @@ public class ClientVendorController {
 
 
     @PutMapping("/{clientVendorId}")
+    @Operation(summary = "Update a Client-Vendor")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated Client-Vendor (CREATED)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> update(@RequestBody ClientVendorDto clientVendorDto, @PathVariable Long clientVendorId) throws Exception {
 
 
@@ -68,6 +100,13 @@ public class ClientVendorController {
     }
 
     @DeleteMapping("/{clientVendorId}")
+    @Operation(summary = "Delete a Client-Vendor")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deleted Client-Vendor (CREATED)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> delete(@PathVariable Long clientVendorId) throws Exception {
 
 

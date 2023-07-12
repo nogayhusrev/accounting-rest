@@ -6,9 +6,14 @@ import com.nogayhusrev.accounting_rest.entity.common.ChargeRequest;
 import com.nogayhusrev.accounting_rest.service.PaymentService;
 import com.nogayhusrev.accounting_rest.service.impl.StripeServiceImpl;
 import com.stripe.exception.StripeException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +39,13 @@ public class PaymentController {
 
 
     @GetMapping()
+    @Operation(summary = "Read all Payments")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Payments (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> list() {
 
         int year = LocalDate.now().getYear();
@@ -47,7 +59,14 @@ public class PaymentController {
         return ResponseEntity.ok(new ResponseWrapper("Payments are successfully retrieved", map, HttpStatus.OK));
     }
 
-    @GetMapping("/{year}")
+    @GetMapping( "/{year}")
+    @Operation(summary = "Read Payments of specified year.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Payments (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> list(@PathVariable String year) {
 
         int selectedYear = (year == null || year.isEmpty()) ? LocalDate.now().getYear() : Integer.parseInt(year);
@@ -66,6 +85,13 @@ public class PaymentController {
 
 
     @GetMapping("/newPayment/{paymentId}")
+    @Operation(summary = "Make a new Payment.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Payment (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> list(@PathVariable Long paymentId) {
 
         PaymentDto payment = paymentService.getPaymentById(paymentId);
@@ -84,6 +110,13 @@ public class PaymentController {
 
 
     @PostMapping("/charge/{paymentId}")
+    @Operation(summary = "Charge a Payment.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully charged Payment (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> charge(@RequestBody ChargeRequest chargeRequest, @PathVariable Long paymentId)
             throws StripeException {
 

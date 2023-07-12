@@ -4,8 +4,13 @@ package com.nogayhusrev.accounting_rest.controller;
 import com.nogayhusrev.accounting_rest.dto.ProductDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
 import com.nogayhusrev.accounting_rest.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,20 +28,41 @@ public class ProductController {
     }
 
 
-    @GetMapping
+    @GetMapping()
+    @Operation(summary = "Read all Products")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Products (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> list() throws Exception {
         List<ProductDto> productDtoList = productService.findAll();
         return ResponseEntity.ok(new ResponseWrapper("Products are successfully retrieved", productDtoList, HttpStatus.OK));
     }
 
     @GetMapping("/{productId}")
+    @Operation(summary = "Read one Product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Product (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> list(@PathVariable Long productId) throws Exception {
         ProductDto productDto = productService.findById(productId);
         return ResponseEntity.ok(new ResponseWrapper("Product successfully retrieved", productDto, HttpStatus.OK));
     }
 
 
-    @PostMapping
+    @PostMapping()
+    @Operation(summary = "Create a Product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully created Product (CREATED)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> create(@RequestBody ProductDto productDto) throws Exception {
 
         if (productService.isExist(productDto)) {
@@ -51,6 +77,13 @@ public class ProductController {
 
 
     @PutMapping("/{productId}")
+    @Operation(summary = "Update a Product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated Product (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> update(@RequestBody ProductDto productDto, @PathVariable Long productId) throws Exception {
 
         if (productService.isExist(productDto, productId)) {
@@ -64,6 +97,13 @@ public class ProductController {
     }
 
     @DeleteMapping("/{productId}")
+    @Operation(summary = "Delete a Product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deleted Product (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> delete(@PathVariable Long productId) throws Exception {
 
         if (productService.findById(productId).getQuantityInStock() > 0) {

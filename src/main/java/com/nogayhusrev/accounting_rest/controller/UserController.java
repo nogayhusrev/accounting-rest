@@ -36,8 +36,8 @@ public class UserController {
         this.companyService = companyService;
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Read all users")
+    @GetMapping()
+    @Operation(summary = "Read all Users")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Users (OK)",
                     content = @Content(mediaType = "application/json")),
@@ -49,7 +49,7 @@ public class UserController {
         return ResponseEntity.ok(new ResponseWrapper("Users are successfully retrieved", userDtoList, HttpStatus.OK));
     }
 
-    @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/{userId}")
     @Operation(summary = "Read one user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved User (OK)",
@@ -63,8 +63,8 @@ public class UserController {
     }
 
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Create a user")
+    @PostMapping()
+    @Operation(summary = "Create an User")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully created User (CREATED)",
                     content = @Content(mediaType = "application/json")),
@@ -84,8 +84,8 @@ public class UserController {
     }
 
 
-    @PutMapping(value = "/{userId}",produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Update an user")
+    @PutMapping("/{userId}")
+    @Operation(summary = "Update an User")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated User (OK)",
                     content = @Content(mediaType = "application/json")),
@@ -105,7 +105,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    @Operation(summary = "Delete an user")
+    @Operation(summary = "Delete an User")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully deleted User (OK)",
                     content = @Content(mediaType = "application/json")),

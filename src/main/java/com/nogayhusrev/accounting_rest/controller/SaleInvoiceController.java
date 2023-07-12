@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +39,7 @@ public class SaleInvoiceController {
     }
 
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping()
     @Operation(summary = "Read all Sale Invoices")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Sale Invoices (OK)",
@@ -54,7 +53,7 @@ public class SaleInvoiceController {
         return ResponseEntity.ok(new ResponseWrapper("Sale Invoices are successfully retrieved", saleInvoices, HttpStatus.OK));
     }
 
-    @GetMapping(value = "/{saleInvoiceId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/{saleInvoiceId}")
     @Operation(summary = "Read one Sale Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Sale Invoice (OK)",
@@ -70,7 +69,7 @@ public class SaleInvoiceController {
     }
 
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping()
     @Operation(summary = "Create a Sale Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully created Sale Invoice (CREATED)",
@@ -91,8 +90,8 @@ public class SaleInvoiceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper("Sale Invoice successfully created", savedSaleInvoice, HttpStatus.CREATED));
     }
 
-    @PutMapping(value = "/{saleInvoiceId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Update an Sale Invoice")
+    @PutMapping("/{saleInvoiceId}")
+    @Operation(summary = "Update a Sale Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated Sale Invoice (OK)",
                     content = @Content(mediaType = "application/json")),
@@ -113,7 +112,7 @@ public class SaleInvoiceController {
     }
 
     @DeleteMapping("/{saleInvoiceId}")
-    @Operation(summary = "Delete an user")
+    @Operation(summary = "Delete an Sale Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully deleted Sale Invoice (OK)",
                     content = @Content(mediaType = "application/json")),
@@ -127,7 +126,7 @@ public class SaleInvoiceController {
         return ResponseEntity.ok(new ResponseWrapper("Sale Invoice successfully deleted", HttpStatus.OK));
     }
 
-    @GetMapping(value = "/approve/{saleInvoiceId}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/approve/{saleInvoiceId}")
     @Operation(summary = "Approve one Sale Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully approved Sale Invoice (OK)",
@@ -144,7 +143,7 @@ public class SaleInvoiceController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseWrapper("Sale Invoice approved", invoiceDto, HttpStatus.OK));
     }
 
-    @PostMapping(value = "/addInvoiceProduct/{saleInvoiceId}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("/addInvoiceProduct/{saleInvoiceId}")
     @Operation(summary = "Add one product to Sale Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully added one product to Sale Invoice (OK)",

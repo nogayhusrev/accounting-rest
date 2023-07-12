@@ -4,6 +4,10 @@ package com.nogayhusrev.accounting_rest.controller;
 import com.nogayhusrev.accounting_rest.dto.CategoryDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
 import com.nogayhusrev.accounting_rest.service.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,18 +28,39 @@ public class CategoryController {
     }
 
     @GetMapping
+    @Operation(summary = "Read all Categories")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Categories (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> list() throws Exception {
         List<CategoryDto> categoryList = categoryService.findAll();
         return ResponseEntity.ok(new ResponseWrapper("Categories are successfully retrieved", categoryList, HttpStatus.OK));
     }
 
     @GetMapping("/{categoryId}")
+    @Operation(summary = "Read one Category")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Category (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> list(@PathVariable Long categoryId) throws Exception {
         CategoryDto categoryDto = categoryService.findById(categoryId);
         return ResponseEntity.ok(new ResponseWrapper("Category successfully retrieved", categoryDto, HttpStatus.OK));
     }
 
     @PostMapping
+    @Operation(summary = "Create a Category")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully created Category (CREATED)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> create(@RequestBody CategoryDto categoryDto) throws Exception {
 
         if (categoryService.isExist(categoryDto)) {
@@ -48,6 +73,13 @@ public class CategoryController {
     }
 
     @PutMapping("/{categoryId}")
+    @Operation(summary = "Update a Category")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated Category (CREATED)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> update(@RequestBody CategoryDto categoryDto, @PathVariable Long categoryId) throws Exception {
 
 
@@ -62,6 +94,13 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{categoryId}")
+    @Operation(summary = "Delete a Category")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deleted Category (CREATED)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> delete(@PathVariable Long categoryId) throws Exception {
 
         if (categoryService.findById(categoryId).isHasProduct()) {

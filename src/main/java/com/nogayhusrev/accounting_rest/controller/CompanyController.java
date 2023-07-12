@@ -6,6 +6,10 @@ import com.nogayhusrev.accounting_rest.dto.CompanyDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
 import com.nogayhusrev.accounting_rest.service.AddressService;
 import com.nogayhusrev.accounting_rest.service.CompanyService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,12 +35,26 @@ public class CompanyController {
     }
 
     @GetMapping
+    @Operation(summary = "Read all Companies")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Companies (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> list() throws Exception {
         List<CompanyDto> companyDtoList = companyService.findAll();
         return ResponseEntity.ok(new ResponseWrapper("Companies are successfully retrieved", companyDtoList, HttpStatus.OK));
     }
 
     @GetMapping("/{companyId}")
+    @Operation(summary = "Read one Company")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Company (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> list(@PathVariable Long companyId) throws Exception {
         CompanyDto companyDto = companyService.findById(companyId);
         return ResponseEntity.ok(new ResponseWrapper("Company successfully retrieved", companyDto, HttpStatus.OK));
@@ -44,6 +62,13 @@ public class CompanyController {
 
 
     @PostMapping
+    @Operation(summary = "Create a Company")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully created Company (CREATED)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> create(@RequestBody CompanyDto companyDto) throws Exception {
 
         if (companyService.isExist(companyDto)) {
@@ -56,6 +81,13 @@ public class CompanyController {
     }
 
     @PutMapping("/{companyId}")
+    @Operation(summary = "Update a Company")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated Company (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> update(@RequestBody CompanyDto companyDto, @PathVariable Long companyId) throws Exception {
 
 
@@ -70,6 +102,13 @@ public class CompanyController {
 
 
     @PutMapping("/activate/{companyId}")
+    @Operation(summary = "Activate a Company")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully activated Company (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> activate(@PathVariable Long companyId) {
 
 
@@ -82,6 +121,13 @@ public class CompanyController {
 
 
     @PutMapping("/deactivate/{companyId}")
+    @Operation(summary = "Deactivate a Company")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deactivated Company (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> deactivate(@PathVariable Long companyId) {
 
 
