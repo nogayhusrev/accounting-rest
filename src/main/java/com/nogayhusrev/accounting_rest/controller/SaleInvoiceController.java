@@ -9,7 +9,13 @@ import com.nogayhusrev.accounting_rest.service.ClientVendorService;
 import com.nogayhusrev.accounting_rest.service.InvoiceProductService;
 import com.nogayhusrev.accounting_rest.service.InvoiceService;
 import com.nogayhusrev.accounting_rest.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/salesInvoices")
+@Tag(name = "SALE INVOICE API", description = "Sale Invoice CRUD Operations")
 public class SaleInvoiceController {
 
     private final InvoiceService invoiceService;
@@ -32,14 +39,29 @@ public class SaleInvoiceController {
         this.productService = productService;
     }
 
-    @GetMapping
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Read all Sale Invoices")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Sale Invoices (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> list() throws Exception {
 
         List<InvoiceDto> saleInvoices = invoiceService.findSaleInvoices();
         return ResponseEntity.ok(new ResponseWrapper("Sale Invoices are successfully retrieved", saleInvoices, HttpStatus.OK));
     }
 
-    @GetMapping("/{saleInvoiceId}")
+    @GetMapping(value = "/{saleInvoiceId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Read one Sale Invoice")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Sale Invoice (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> getInvoiceById(@PathVariable Long saleInvoiceId) {
 
         InvoiceDto saleInvoice = invoiceService.findById(saleInvoiceId);
@@ -47,7 +69,15 @@ public class SaleInvoiceController {
         return ResponseEntity.ok(new ResponseWrapper("Sale Invoice successfully retrieved", saleInvoice, HttpStatus.OK));
     }
 
-    @PostMapping
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Create a Sale Invoice")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully created Sale Invoice (CREATED)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> create(@RequestBody InvoiceDto invoiceDto) throws Exception {
 
         if (invoiceService.isExist(invoiceDto)) {
@@ -61,7 +91,14 @@ public class SaleInvoiceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper("Sale Invoice successfully created", savedSaleInvoice, HttpStatus.CREATED));
     }
 
-    @PutMapping("/{saleInvoiceId}")
+    @PutMapping(value = "/{saleInvoiceId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Update an Sale Invoice")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated Sale Invoice (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> update(@RequestBody InvoiceDto invoiceDto, @PathVariable Long saleInvoiceId) throws Exception {
 
 
@@ -76,6 +113,13 @@ public class SaleInvoiceController {
     }
 
     @DeleteMapping("/{saleInvoiceId}")
+    @Operation(summary = "Delete an user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deleted Sale Invoice (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> delete(@PathVariable Long saleInvoiceId) {
 
         invoiceService.delete(saleInvoiceId);
@@ -83,7 +127,14 @@ public class SaleInvoiceController {
         return ResponseEntity.ok(new ResponseWrapper("Sale Invoice successfully deleted", HttpStatus.OK));
     }
 
-    @GetMapping("/approve/{saleInvoiceId}")
+    @GetMapping(value = "/approve/{saleInvoiceId}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Approve one Sale Invoice")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully approved Sale Invoice (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> approve(@PathVariable Long saleInvoiceId) {
 
         invoiceService.approve(saleInvoiceId);
@@ -93,7 +144,14 @@ public class SaleInvoiceController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseWrapper("Sale Invoice approved", invoiceDto, HttpStatus.OK));
     }
 
-    @PostMapping("/addInvoiceProduct/{saleInvoiceId}")
+    @PostMapping(value = "/addInvoiceProduct/{saleInvoiceId}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Add one product to Sale Invoice")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully added one product to Sale Invoice (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> addInvoiceProductToSaleInvoice(@RequestBody InvoiceProductDto invoiceProductDto, @PathVariable Long saleInvoiceId) {
 
 
@@ -103,7 +161,6 @@ public class SaleInvoiceController {
 
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseWrapper("Sale Invoice Products added", invoiceDto, HttpStatus.OK));
     }
-
 
 
 }

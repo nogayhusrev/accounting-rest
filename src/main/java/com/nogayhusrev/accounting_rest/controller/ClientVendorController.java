@@ -5,6 +5,7 @@ import com.nogayhusrev.accounting_rest.dto.ClientVendorDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
 import com.nogayhusrev.accounting_rest.service.AddressService;
 import com.nogayhusrev.accounting_rest.service.ClientVendorService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/clientVendors")
+@Tag(name = "CLIENT-VENDOR API", description = "Client-Vendor CRUD Operations")
+
 public class ClientVendorController {
 
     private final ClientVendorService clientVendorService;

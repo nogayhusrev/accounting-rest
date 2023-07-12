@@ -4,6 +4,7 @@ package com.nogayhusrev.accounting_rest.controller;
 import com.nogayhusrev.accounting_rest.dto.InvoiceProductDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
 import com.nogayhusrev.accounting_rest.service.ReportingService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -17,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/reports")
+@Tag(name = "REPORT API", description = "Reporting Operations")
 public class ReportingController {
 
     private final ReportingService reportingService;

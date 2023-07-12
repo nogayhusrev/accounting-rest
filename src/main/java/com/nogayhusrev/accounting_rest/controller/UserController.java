@@ -7,8 +7,13 @@ import com.nogayhusrev.accounting_rest.service.CompanyService;
 import com.nogayhusrev.accounting_rest.service.RoleService;
 import com.nogayhusrev.accounting_rest.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
-@Tag(name = "User", description = "User CRUD Operations")
+@Tag(name = "USER API", description = "User CRUD Operations")
 public class UserController {
 
     private final UserService userService;
@@ -31,23 +36,41 @@ public class UserController {
         this.companyService = companyService;
     }
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Read all users")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Users (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> list() throws Exception {
         List<UserDto> userDtoList = userService.findAll();
         return ResponseEntity.ok(new ResponseWrapper("Users are successfully retrieved", userDtoList, HttpStatus.OK));
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Read one user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved User (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> list(@PathVariable Long userId) throws Exception {
         UserDto userDto = userService.findById(userId);
         return ResponseEntity.ok(new ResponseWrapper("User successfully retrieved", userDto, HttpStatus.OK));
     }
 
 
-    @PostMapping
-    @Operation(summary = "Create an user")
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Create a user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully created User (CREATED)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> create(@RequestBody UserDto userDto) throws Exception {
 
         if (userService.isExist(userDto)) {
@@ -61,8 +84,14 @@ public class UserController {
     }
 
 
-    @PutMapping("/{userId}")
+    @PutMapping(value = "/{userId}",produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Update an user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated User (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> update(@RequestBody UserDto userDto, @PathVariable Long userId) throws Exception {
 
         if (userService.isExist(userDto, userId)) {
@@ -77,6 +106,12 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     @Operation(summary = "Delete an user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deleted User (OK)",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    })
     public ResponseEntity<ResponseWrapper> delete(@PathVariable Long userId) throws Exception {
 
         userService.delete(userId);

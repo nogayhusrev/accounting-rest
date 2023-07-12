@@ -6,6 +6,7 @@ import com.nogayhusrev.accounting_rest.entity.common.ChargeRequest;
 import com.nogayhusrev.accounting_rest.service.PaymentService;
 import com.nogayhusrev.accounting_rest.service.impl.StripeServiceImpl;
 import com.stripe.exception.StripeException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/payments")
+@Tag(name = "PAYMENT API", description = "Payment Operations")
 public class PaymentController {
 
     private final StripeServiceImpl stripeServiceImpl;

@@ -35,28 +35,44 @@ public class AddressController {
         return ResponseEntity.ok(new ResponseWrapper("Countries and States are successfully retrieved", countriesAndStatesResponse, HttpStatus.OK));
     }
 
+//    @GetMapping("/list")
+//    public ResponseEntity<ResponseWrapper> getCountryAndStates() {
+//        // Set the request body
+//        CountryAndItsStatesPOSTRequest requestBody = new CountryAndItsStatesPOSTRequest();
+//        requestBody.setCountry("Turkey");
+//
+//        CountryAndItsStatesPOSTResponse response = addressClient.getCountriesAndStatesPOSTResponse(requestBody);
+//
+//        return ResponseEntity.ok(new ResponseWrapper("Countries and States are successfully retrieved", response, HttpStatus.OK));
+//    }
 
-    @GetMapping("/list")
-    public ResponseEntity<CountryAndItsStatesPOSTResponse> getCountryAndStates() {
-        // Set the request URL
-        String url = "https://countriesnow.space/api/v0.1/countries/states";
 
-        // Set the request headers
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Set the request body
-        CountryAndItsStatesPOSTRequest requestBody = new CountryAndItsStatesPOSTRequest();
-        requestBody.setCountry("Turkey");
 
-        HttpEntity<CountryAndItsStatesPOSTRequest> requestEntity = new HttpEntity<>(requestBody, headers);
-
-        // Send the POST request
-        ResponseEntity<CountryAndItsStatesPOSTResponse> response = restTemplate.postForEntity(url, requestEntity, CountryAndItsStatesPOSTResponse.class);
-
-        // Process the response
-       return response;
-    }
+//    @GetMapping("/list")
+//    public ResponseEntity<ResponseWrapper> getCountryAndStates() {
+//        // Set the request URL
+//        String url = "https://countriesnow.space/api/v0.1/countries/states";
+//
+//        // Set the request headers
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//
+//        // Set the request body
+//        CountryAndItsStatesPOSTRequest requestBody = new CountryAndItsStatesPOSTRequest();
+//        requestBody.setCountry("Turkey");
+//
+//        HttpEntity<CountryAndItsStatesPOSTRequest> requestEntity = new HttpEntity<>(requestBody, headers);
+//
+//        // Send the POST request
+//        ResponseWrapper response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, ResponseWrapper.class).getBody();
+//
+//        response.setMessage("!!!!!!");
+//
+//        // Process the response
+//        return ResponseEntity.ok(response);
+//    }
 }
 
 

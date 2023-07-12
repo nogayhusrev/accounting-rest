@@ -4,6 +4,7 @@ package com.nogayhusrev.accounting_rest.controller;
 import com.nogayhusrev.accounting_rest.dto.CategoryDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
 import com.nogayhusrev.accounting_rest.service.CategoryService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/categories")
+@Tag(name = "CATEGORY API", description = "Category CRUD Operations")
 public class CategoryController {
 
     private final CategoryService categoryService;

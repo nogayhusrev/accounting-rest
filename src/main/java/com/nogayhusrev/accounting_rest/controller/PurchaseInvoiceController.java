@@ -9,6 +9,7 @@ import com.nogayhusrev.accounting_rest.service.ClientVendorService;
 import com.nogayhusrev.accounting_rest.service.InvoiceProductService;
 import com.nogayhusrev.accounting_rest.service.InvoiceService;
 import com.nogayhusrev.accounting_rest.service.ProductService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/purchaseInvoices")
+@Tag(name = "PURCHASE INVOICE API", description = "Purchase Invoice CRUD Operations")
 public class PurchaseInvoiceController {
 
     private final InvoiceService invoiceService;

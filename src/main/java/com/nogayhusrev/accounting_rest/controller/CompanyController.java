@@ -6,6 +6,7 @@ import com.nogayhusrev.accounting_rest.dto.CompanyDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
 import com.nogayhusrev.accounting_rest.service.AddressService;
 import com.nogayhusrev.accounting_rest.service.CompanyService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,8 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/api/v1/companies")
+@Tag(name = "COMPANY API", description = "Company CRUD Operations")
+
 public class CompanyController {
 
     private final CompanyService companyService;

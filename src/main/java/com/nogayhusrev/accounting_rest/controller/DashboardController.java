@@ -6,6 +6,7 @@ import com.nogayhusrev.accounting_rest.service.CompanyService;
 import com.nogayhusrev.accounting_rest.service.DashboardService;
 import com.nogayhusrev.accounting_rest.service.InvoiceService;
 import com.nogayhusrev.accounting_rest.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
+@Tag(name = "DASHBOARD API", description = "Dashboard Operations")
 public class DashboardController {
 
     private final InvoiceService invoiceService;
