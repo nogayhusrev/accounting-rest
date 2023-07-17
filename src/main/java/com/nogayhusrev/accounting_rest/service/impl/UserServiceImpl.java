@@ -6,7 +6,6 @@ import com.nogayhusrev.accounting_rest.entity.Company;
 import com.nogayhusrev.accounting_rest.entity.User;
 import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.repository.UserRepository;
-import com.nogayhusrev.accounting_rest.service.KeycloakService;
 import com.nogayhusrev.accounting_rest.service.SecurityService;
 import com.nogayhusrev.accounting_rest.service.UserService;
 import org.springframework.context.annotation.Lazy;
@@ -23,17 +22,13 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final MapperUtil mapperUtil;
     private final PasswordEncoder passwordEncoder;
-
     private final SecurityService securityService;
 
-    private final KeycloakService keycloakService;
-
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService, KeycloakService keycloakService) {
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
         this.passwordEncoder = passwordEncoder;
         this.securityService = securityService;
-        this.keycloakService = keycloakService;
     }
 
 
@@ -57,11 +52,13 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> findAll() {
 
         List<User> userList;
-        if (getCurrentUser().getRole().getDescription().equals("Root User")) {
+        if (getCurrentUser().getRole().getDescription().equals("Root")) {
             userList = userRepository.findAllByRole_Description("Admin");
         } else {
             userList = userRepository.findAllByCompany(mapperUtil.convert(securityService.getCurrentUser().getCompany(), new Company()));
         }
+
+
         return userList.stream()
                 .sorted(Comparator.comparing((User u) -> u.getCompany().getTitle()).thenComparing(u -> u.getRole().getDescription()))
                 .map(user -> mapperUtil.convert(user, new UserDto()))
@@ -89,7 +86,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setEnabled(true);
 
-        keycloakService.userCreate(userDto);
+        securityService.userCreate(userDto);
 
         userRepository.save(user);
 
