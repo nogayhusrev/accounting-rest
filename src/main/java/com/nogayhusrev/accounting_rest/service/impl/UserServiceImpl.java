@@ -6,6 +6,7 @@ import com.nogayhusrev.accounting_rest.entity.Company;
 import com.nogayhusrev.accounting_rest.entity.User;
 import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.repository.UserRepository;
+import com.nogayhusrev.accounting_rest.service.KeycloakService;
 import com.nogayhusrev.accounting_rest.service.SecurityService;
 import com.nogayhusrev.accounting_rest.service.UserService;
 import org.springframework.context.annotation.Lazy;
@@ -25,11 +26,14 @@ public class UserServiceImpl implements UserService {
 
     private final SecurityService securityService;
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService) {
+    private final KeycloakService keycloakService;
+
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService, KeycloakService keycloakService) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
         this.passwordEncoder = passwordEncoder;
         this.securityService = securityService;
+        this.keycloakService = keycloakService;
     }
 
 
@@ -84,6 +88,9 @@ public class UserServiceImpl implements UserService {
         User user = mapperUtil.convert(userDto, new User());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setEnabled(true);
+
+        keycloakService.userCreate(userDto);
+
         userRepository.save(user);
 
     }

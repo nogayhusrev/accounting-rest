@@ -17,12 +17,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
-@Tag(name = "DASHBOARD API", description = "Dashboard Operations")
+@Tag(name = "Dashboard Controller", description = "Dashboard API")
 public class DashboardController {
 
     private final InvoiceService invoiceService;
@@ -38,6 +39,7 @@ public class DashboardController {
     }
 
     @GetMapping()
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Read all Dashboard Data")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Dashboard (OK)",
@@ -55,8 +57,7 @@ public class DashboardController {
         map.put("exchangeRates", dashboardService.getExchangeRates());
 
 
-
-        return ResponseEntity.ok(new ResponseWrapper("Dashboard successfully retrieved",map, HttpStatus.OK));
+        return ResponseEntity.ok(new ResponseWrapper("Dashboard successfully retrieved", map, HttpStatus.OK));
 
     }
 }

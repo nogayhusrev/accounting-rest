@@ -16,11 +16,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 @Controller
 @RequestMapping("/api/v1/companies")
-@Tag(name = "COMPANY API", description = "Company CRUD Operations")
+@Tag(name = "Company Controller", description = "Company API")
 
 public class CompanyController {
 
@@ -35,6 +36,7 @@ public class CompanyController {
     }
 
     @GetMapping
+    @RolesAllowed("Root")
     @Operation(summary = "Read all Companies")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Companies (OK)",
@@ -48,6 +50,7 @@ public class CompanyController {
     }
 
     @GetMapping("/{companyId}")
+    @RolesAllowed("Root")
     @Operation(summary = "Read one Company")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Company (OK)",
@@ -62,6 +65,7 @@ public class CompanyController {
 
 
     @PostMapping
+    @RolesAllowed("Root")
     @Operation(summary = "Create a Company")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully created Company (CREATED)",
@@ -81,6 +85,7 @@ public class CompanyController {
     }
 
     @PutMapping("/{companyId}")
+    @RolesAllowed("Root")
     @Operation(summary = "Update a Company")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated Company (OK)",
@@ -102,6 +107,7 @@ public class CompanyController {
 
 
     @PutMapping("/activate/{companyId}")
+    @RolesAllowed("Root")
     @Operation(summary = "Activate a Company")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully activated Company (OK)",
@@ -121,6 +127,7 @@ public class CompanyController {
 
 
     @PutMapping("/deactivate/{companyId}")
+    @RolesAllowed("Root")
     @Operation(summary = "Deactivate a Company")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully deactivated Company (OK)",

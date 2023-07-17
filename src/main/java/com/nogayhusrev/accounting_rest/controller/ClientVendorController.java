@@ -14,11 +14,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/clientVendors")
-@Tag(name = "CLIENT-VENDOR API", description = "Client-Vendor CRUD Operations")
+@Tag(name = "Client-Vendor Controller", description = "Client-Vendor API")
 
 public class ClientVendorController {
 
@@ -31,6 +32,7 @@ public class ClientVendorController {
     }
 
     @GetMapping
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Read all Client-Vendors")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Client-Vendors (OK)",
@@ -45,6 +47,7 @@ public class ClientVendorController {
     }
 
     @GetMapping("/{clientVendorId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Read one Client-Vendor")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Client-Vendor (OK)",
@@ -59,6 +62,7 @@ public class ClientVendorController {
 
 
     @PostMapping
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Create a Client-Vendor")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully created Client-Vendor (CREATED)",
@@ -79,6 +83,7 @@ public class ClientVendorController {
 
 
     @PutMapping("/{clientVendorId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Update a Client-Vendor")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated Client-Vendor (CREATED)",
@@ -100,6 +105,7 @@ public class ClientVendorController {
     }
 
     @DeleteMapping("/{clientVendorId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Delete a Client-Vendor")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully deleted Client-Vendor (CREATED)",

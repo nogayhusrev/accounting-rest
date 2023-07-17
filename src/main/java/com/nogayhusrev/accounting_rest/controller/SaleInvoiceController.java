@@ -18,11 +18,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/salesInvoices")
-@Tag(name = "SALE INVOICE API", description = "Sale Invoice CRUD Operations")
+@Tag(name = "Sale Invoice Controller", description = "Sale Invoice API")
 public class SaleInvoiceController {
 
     private final InvoiceService invoiceService;
@@ -40,6 +41,7 @@ public class SaleInvoiceController {
 
 
     @GetMapping()
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Read all Sale Invoices")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Sale Invoices (OK)",
@@ -54,6 +56,7 @@ public class SaleInvoiceController {
     }
 
     @GetMapping("/{saleInvoiceId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Read one Sale Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Sale Invoice (OK)",
@@ -70,6 +73,7 @@ public class SaleInvoiceController {
 
 
     @PostMapping()
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Create a Sale Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully created Sale Invoice (CREATED)",
@@ -91,6 +95,7 @@ public class SaleInvoiceController {
     }
 
     @PutMapping("/{saleInvoiceId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Update a Sale Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated Sale Invoice (OK)",
@@ -112,6 +117,7 @@ public class SaleInvoiceController {
     }
 
     @DeleteMapping("/{saleInvoiceId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Delete an Sale Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully deleted Sale Invoice (OK)",
@@ -127,6 +133,7 @@ public class SaleInvoiceController {
     }
 
     @GetMapping("/approve/{saleInvoiceId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Approve one Sale Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully approved Sale Invoice (OK)",
@@ -144,6 +151,7 @@ public class SaleInvoiceController {
     }
 
     @PostMapping("/addInvoiceProduct/{saleInvoiceId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Add one product to Sale Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully added one product to Sale Invoice (OK)",

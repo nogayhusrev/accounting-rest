@@ -27,12 +27,13 @@ public class LoggingAspect {
 
 
     @Pointcut("execution(* com.nogayhusrev.accounting_rest.controller..*(..))")
-    public void controllerPointcut(){}
+    public void controllerPointcut() {
+    }
 
     @Before("controllerPointcut()")
-    public void beforeControllerPointcut(JoinPoint joinPoint){
+    public void beforeControllerPointcut(JoinPoint joinPoint) {
         log.info("|| *** ===>>>LOG INFO<<<=== *** || Before || Method: {}, Arguments: {}, User: {}, Target: {}",
-                joinPoint.getSignature(), joinPoint.getArgs(),getUsername(), joinPoint.getTarget());
+                joinPoint.getSignature(), joinPoint.getArgs(), getUsername(), joinPoint.getTarget());
     }
 
     @AfterReturning(pointcut = "controllerPointcut()", returning = "results")
@@ -50,8 +51,6 @@ public class LoggingAspect {
                 , getUsername()
                 , exception.getMessage());
     }
-
-
 
 
 }

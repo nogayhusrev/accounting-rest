@@ -13,11 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/categories")
-@Tag(name = "CATEGORY API", description = "Category CRUD Operations")
+@Tag(name = "Category Controller", description = "Category API")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -28,6 +29,7 @@ public class CategoryController {
     }
 
     @GetMapping
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Read all Categories")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Categories (OK)",
@@ -41,6 +43,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Read one Category")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Category (OK)",
@@ -54,6 +57,7 @@ public class CategoryController {
     }
 
     @PostMapping
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Create a Category")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully created Category (CREATED)",
@@ -73,6 +77,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{categoryId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Update a Category")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated Category (CREATED)",
@@ -94,6 +99,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{categoryId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Delete a Category")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully deleted Category (CREATED)",

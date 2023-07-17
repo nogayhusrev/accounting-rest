@@ -7,21 +7,20 @@ import com.nogayhusrev.accounting_rest.service.CompanyService;
 import com.nogayhusrev.accounting_rest.service.RoleService;
 import com.nogayhusrev.accounting_rest.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
-@Tag(name = "USER API", description = "User CRUD Operations")
+@Tag(name = "User Controller", description = "User API")
 public class UserController {
 
     private final UserService userService;
@@ -37,6 +36,7 @@ public class UserController {
     }
 
     @GetMapping()
+    @RolesAllowed({"Root", "Admin"})
     @Operation(summary = "Read all Users")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Users (OK)",
@@ -50,6 +50,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
+    @RolesAllowed({"Root", "Admin"})
     @Operation(summary = "Read one user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved User (OK)",
@@ -64,6 +65,7 @@ public class UserController {
 
 
     @PostMapping()
+    @RolesAllowed({"Root", "Admin"})
     @Operation(summary = "Create an User")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully created User (CREATED)",
@@ -85,6 +87,7 @@ public class UserController {
 
 
     @PutMapping("/{userId}")
+    @RolesAllowed({"Root", "Admin"})
     @Operation(summary = "Update an User")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated User (OK)",
@@ -105,6 +108,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
+    @RolesAllowed({"Root", "Admin"})
     @Operation(summary = "Delete an User")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully deleted User (OK)",

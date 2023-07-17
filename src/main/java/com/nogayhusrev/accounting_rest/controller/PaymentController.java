@@ -13,17 +13,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/payments")
-@Tag(name = "PAYMENT API", description = "Payment Operations")
+@Tag(name = "Payment Controller", description = "Payment API")
 public class PaymentController {
 
     private final StripeServiceImpl stripeServiceImpl;
@@ -39,6 +39,7 @@ public class PaymentController {
 
 
     @GetMapping()
+    @RolesAllowed("Admin")
     @Operation(summary = "Read all Payments")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Payments (OK)",
@@ -59,7 +60,8 @@ public class PaymentController {
         return ResponseEntity.ok(new ResponseWrapper("Payments are successfully retrieved", map, HttpStatus.OK));
     }
 
-    @GetMapping( "/{year}")
+    @GetMapping("/{year}")
+    @RolesAllowed("Admin")
     @Operation(summary = "Read Payments of specified year.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Payments (OK)",
@@ -85,6 +87,7 @@ public class PaymentController {
 
 
     @GetMapping("/newPayment/{paymentId}")
+    @RolesAllowed("Admin")
     @Operation(summary = "Make a new Payment.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Payment (OK)",
@@ -110,6 +113,7 @@ public class PaymentController {
 
 
     @PostMapping("/charge/{paymentId}")
+    @RolesAllowed("Admin")
     @Operation(summary = "Charge a Payment.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully charged Payment (OK)",

@@ -15,15 +15,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/purchaseInvoices")
-@Tag(name = "PURCHASE INVOICE API", description = "Purchase Invoice CRUD Operations")
+@Tag(name = "Purchase Invoice Controller", description = "Purchase Invoice API")
 public class PurchaseInvoiceController {
 
     private final InvoiceService invoiceService;
@@ -41,6 +41,7 @@ public class PurchaseInvoiceController {
 
 
     @GetMapping()
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Read all Purchase Invoices")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Purchase Invoices (OK)",
@@ -55,6 +56,7 @@ public class PurchaseInvoiceController {
     }
 
     @GetMapping("/{purchaseInvoiceId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Read one Purchase Invoices")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Purchase Invoice (OK)",
@@ -70,6 +72,7 @@ public class PurchaseInvoiceController {
     }
 
     @PostMapping()
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Create a Purchase Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully created Purchase Invoice (CREATED)",
@@ -91,6 +94,7 @@ public class PurchaseInvoiceController {
     }
 
     @PutMapping("/{purchaseInvoiceId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Update a Purchase Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated Purchase Invoice (OK)",
@@ -113,6 +117,7 @@ public class PurchaseInvoiceController {
 
 
     @DeleteMapping("/{purchaseInvoiceId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Delete an Purchase Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully deleted Purchase Invoice (OK)",
@@ -128,6 +133,7 @@ public class PurchaseInvoiceController {
     }
 
     @GetMapping("/approve/{purchaseInvoiceId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Approve one Purchase Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully approved Purchase Invoice (OK)",
@@ -146,6 +152,7 @@ public class PurchaseInvoiceController {
 
 
     @PostMapping("/addInvoiceProduct/{purchaseInvoiceId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Add one product to Purchase Invoice")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully added one product to Purchase Invoice (OK)",

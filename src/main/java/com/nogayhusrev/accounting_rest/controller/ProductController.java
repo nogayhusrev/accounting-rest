@@ -10,15 +10,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/products")
-@Tag(name = "PRODUCT API", description = "Product CRUD Operations")
+@Tag(name = "Product Controller", description = "Product API")
 public class ProductController {
 
     private final ProductService productService;
@@ -29,6 +29,7 @@ public class ProductController {
 
 
     @GetMapping()
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Read all Products")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Products (OK)",
@@ -42,6 +43,7 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Read one Product")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Product (OK)",
@@ -56,6 +58,7 @@ public class ProductController {
 
 
     @PostMapping()
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Create a Product")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully created Product (CREATED)",
@@ -77,6 +80,7 @@ public class ProductController {
 
 
     @PutMapping("/{productId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Update a Product")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated Product (OK)",
@@ -97,6 +101,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{productId}")
+    @RolesAllowed({"Manager", "Employee"})
     @Operation(summary = "Delete a Product")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully deleted Product (OK)",
