@@ -1,0 +1,4 @@
+2023-07-15 17:26:55,840 WARN  [org.keycloak.events] (default task-14) type=LOGIN_ERROR, realmId=0d7fc964-2214-43e3-85bd-fa3adfc5fee9, clientId=null, userId=null, ipAddress=127.0.0.1, error=expired_code, restart_after_timeout=true, authSessionParentId=2a059adb-a54f-40a9-bf61-15192bc9c63b, authSessionTabId=jOOffx09C1o
+2023-07-15 17:28:09,748 WARN  [org.keycloak.events] (default task-18) type=LOGIN_ERROR, realmId=Ticketing-Dev, clientId=null, userId=null, ipAddress=127.0.0.1, error=invalid_request
+2023-07-15 17:29:04,565 WARN  [org.keycloak.events] (default task-18) type=LOGIN_ERROR, realmId=Ticketing-Dev, clientId=null, userId=null, ipAddress=127.0.0.1, error=invalid_request
+2023-07-15 23:52:37,818 WARN  [org.keycloak.events] (default task-22) type=REFRESH_TOKEN_ERROR, realmId=0d7fc964-2214-43e3-85bd-fa3adfc5fee9, clientId=security-admin-console, userId=null, ipAddress=127.0.0.1, error=invalid_token, grant_type=refresh_token, client_auth_method=client-secret

@@ -37,14 +37,6 @@ public class AccountingRestApplication {
         return new RestTemplate();
     }
 
-    @Bean
-    public OpenAPI customOpenApi() {
-        return new OpenAPI().info(new Info()
-                        .title("Accounting Application")
-                        .version("v3")
-                        .description("Accounting Application API documentation"))
-                .servers(List.of(new Server().url("localhost:8081").description("Dev Environment")));
-    }
 
 
 
