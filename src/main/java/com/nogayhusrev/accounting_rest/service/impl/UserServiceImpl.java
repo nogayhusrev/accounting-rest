@@ -34,12 +34,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findById(Long userId) {
-        return mapperUtil.convert(userRepository.findUserById(userId), new UserDto());
-    }
 
-    @Override
-    public UserDto findByUsername(String username) {
-        return mapperUtil.convert(userRepository.findUserByUsername(username), new UserDto());
+        List<User> userList = userRepository.findAllByCompany(mapperUtil.convert(getCurrentUser().getCompany(), new Company()));
+
+        UserDto user = userList.stream()
+                .sorted(Comparator.comparing((User u) -> u.getCompany().getTitle()).thenComparing(u -> u.getRole().getDescription()))
+                .filter(savedUser -> savedUser.getId() == userId )
+                .map(savedUser -> mapperUtil.convert(savedUser, new UserDto()))
+                .map(savedUser -> {
+                    isOnlyAdmin(savedUser);
+                    return savedUser;
+                })
+                .findFirst().get();
+
+        return user;
+
     }
 
     @Override
@@ -73,11 +82,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findByName(String username) {
-        User user = userRepository.findAll().stream()
-                .filter(savedUser -> savedUser.getUsername().equalsIgnoreCase(username))
-                .findFirst().get();
 
-        return mapperUtil.convert(user, new UserDto());
+
+        UserDto user = findAll().stream()
+                .filter(userDto -> userDto.getUsername().equals(username))
+                .findFirst()
+                .get();
+
+
+        return user;
     }
 
     @Override
@@ -106,6 +119,8 @@ public class UserServiceImpl implements UserService {
 
         user.setIsDeleted(true);
         userRepository.save(user);
+
+        securityService.delete(user.getUsername());
     }
 
     @Override

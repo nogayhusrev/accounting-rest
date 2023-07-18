@@ -69,7 +69,7 @@ public class SecurityServiceImpl implements SecurityService {
         IDToken token = kPrincipal.getKeycloakSecurityContext().getToken();
 
 
-        return userService.findByUsername(token.getPreferredUsername());
+        return userService.findByName(token.getPreferredUsername());
     }
 
     @Override
