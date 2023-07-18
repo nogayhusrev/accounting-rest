@@ -1,8 +1,11 @@
 package com.nogayhusrev.accounting_rest.service.impl;
 
+import com.nogayhusrev.accounting_rest.dto.CategoryDto;
 import com.nogayhusrev.accounting_rest.dto.ClientVendorDto;
+import com.nogayhusrev.accounting_rest.entity.Category;
 import com.nogayhusrev.accounting_rest.entity.ClientVendor;
 import com.nogayhusrev.accounting_rest.entity.Company;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.repository.ClientVendorRepository;
 import com.nogayhusrev.accounting_rest.service.ClientVendorService;
@@ -28,13 +31,20 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
 
     @Override
-    public ClientVendorDto findById(Long clientVendorId) {
-        return mapperUtil.convert(clientVendorRepository.findById(clientVendorId).get(), new ClientVendorDto());
+    public ClientVendorDto findById(Long clientVendorId) throws AccountingProjectException {
+        ClientVendor clientVendor = clientVendorRepository.findById(clientVendorId).get();
+
+        if (clientVendor.getCompany().getTitle().equals(userService.getCurrentUser().getCompany().getTitle()))
+            return mapperUtil.convert(clientVendor, new ClientVendorDto());
+
+        throw new AccountingProjectException("ClientVendor Not Found");
+
     }
 
     @Override
     public List<ClientVendorDto> findAll() {
         Company company = mapperUtil.convert(userService.getCurrentUser().getCompany(), new Company());
+
         return clientVendorRepository
                 .findAllByCompany(company)
                 .stream()
@@ -45,11 +55,13 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     }
 
     @Override
-    public ClientVendorDto findByName(String clientVendorName) {
+    public ClientVendorDto findByName(String clientVendorName) throws AccountingProjectException {
         ClientVendor clientVendor = clientVendorRepository.findAll().stream()
                 .filter(savedClientVendor -> savedClientVendor.getClientVendorName().equalsIgnoreCase(clientVendorName))
                 .findFirst().get();
 
+        if (clientVendor == null)
+            throw new AccountingProjectException("Category Not Found");
 
         return mapperUtil.convert(clientVendor, new ClientVendorDto());
 

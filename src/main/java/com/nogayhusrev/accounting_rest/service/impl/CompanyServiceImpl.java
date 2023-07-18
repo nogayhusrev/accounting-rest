@@ -1,13 +1,17 @@
 package com.nogayhusrev.accounting_rest.service.impl;
 
 
+import com.nogayhusrev.accounting_rest.dto.ClientVendorDto;
 import com.nogayhusrev.accounting_rest.dto.CompanyDto;
+import com.nogayhusrev.accounting_rest.entity.ClientVendor;
 import com.nogayhusrev.accounting_rest.entity.Company;
 import com.nogayhusrev.accounting_rest.enums.CompanyStatus;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.repository.CompanyRepository;
 import com.nogayhusrev.accounting_rest.service.CompanyService;
 import com.nogayhusrev.accounting_rest.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -23,6 +27,9 @@ public class CompanyServiceImpl implements CompanyService {
 
     private final UserService userService;
 
+    @Value("company")
+    private String companyName;
+
     public CompanyServiceImpl(CompanyRepository companyRepository, MapperUtil mapperUtil, UserService userService) {
         this.companyRepository = companyRepository;
         this.mapperUtil = mapperUtil;
@@ -31,8 +38,15 @@ public class CompanyServiceImpl implements CompanyService {
 
 
     @Override
-    public CompanyDto findById(Long companyId) {
-        return mapperUtil.convert(companyRepository.findById(companyId).get(), new CompanyDto());
+    public CompanyDto findById(Long companyId) throws AccountingProjectException {
+
+        Company company = companyRepository.findById(companyId).get();
+
+        if (company.getTitle().equals(companyName))
+            return mapperUtil.convert(companyRepository.findById(companyId).get(), new CompanyDto());
+
+        throw new AccountingProjectException("Company Not Found");
+
     }
 
     @Override

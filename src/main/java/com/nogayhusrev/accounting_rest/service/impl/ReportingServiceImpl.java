@@ -5,6 +5,7 @@ import com.nogayhusrev.accounting_rest.dto.InvoiceProductDto;
 import com.nogayhusrev.accounting_rest.entity.InvoiceProduct;
 import com.nogayhusrev.accounting_rest.enums.InvoiceStatus;
 import com.nogayhusrev.accounting_rest.enums.InvoiceType;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.service.InvoiceProductService;
 import com.nogayhusrev.accounting_rest.service.ReportingService;
@@ -31,7 +32,7 @@ public class ReportingServiceImpl implements ReportingService {
 
 
     @Override
-    public List<InvoiceProductDto> getStock() {
+    public List<InvoiceProductDto> getStock() throws AccountingProjectException {
         return invoiceProductService.findAll().stream()
                 .filter(invoiceProductDto -> invoiceProductDto.getInvoice().getInvoiceStatus().equals(InvoiceStatus.APPROVED))
                 .sorted(Comparator.comparing(InvoiceProductDto::getId).reversed())

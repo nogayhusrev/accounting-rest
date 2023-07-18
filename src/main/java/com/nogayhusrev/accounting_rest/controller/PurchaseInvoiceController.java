@@ -5,6 +5,7 @@ import com.nogayhusrev.accounting_rest.dto.InvoiceDto;
 import com.nogayhusrev.accounting_rest.dto.InvoiceProductDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
 import com.nogayhusrev.accounting_rest.enums.InvoiceType;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.service.ClientVendorService;
 import com.nogayhusrev.accounting_rest.service.InvoiceProductService;
 import com.nogayhusrev.accounting_rest.service.InvoiceService;
@@ -64,7 +65,7 @@ public class PurchaseInvoiceController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> getInvoiceById(@PathVariable Long purchaseInvoiceId) {
+    public ResponseEntity<ResponseWrapper> getInvoiceById(@PathVariable Long purchaseInvoiceId) throws AccountingProjectException {
 
         InvoiceDto purchaseInvoice = invoiceService.findById(purchaseInvoiceId);
 
@@ -125,7 +126,7 @@ public class PurchaseInvoiceController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long purchaseInvoiceId) {
+    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long purchaseInvoiceId) throws AccountingProjectException {
 
         invoiceService.delete(purchaseInvoiceId);
 
@@ -141,7 +142,7 @@ public class PurchaseInvoiceController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> approve(@PathVariable Long purchaseInvoiceId) {
+    public ResponseEntity<ResponseWrapper> approve(@PathVariable Long purchaseInvoiceId) throws AccountingProjectException {
 
         invoiceService.approve(purchaseInvoiceId);
 
@@ -160,7 +161,7 @@ public class PurchaseInvoiceController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> addInvoiceProductToPurchaseInvoice(@RequestBody InvoiceProductDto invoiceProductDto, @PathVariable Long purchaseInvoiceId) {
+    public ResponseEntity<ResponseWrapper> addInvoiceProductToPurchaseInvoice(@RequestBody InvoiceProductDto invoiceProductDto, @PathVariable Long purchaseInvoiceId) throws AccountingProjectException {
 
 
         invoiceProductService.saveInvoiceProductByInvoiceId(invoiceProductDto, purchaseInvoiceId);

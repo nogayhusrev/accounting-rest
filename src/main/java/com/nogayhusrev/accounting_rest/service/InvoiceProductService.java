@@ -4,6 +4,7 @@ import com.nogayhusrev.accounting_rest.dto.InvoiceProductDto;
 import com.nogayhusrev.accounting_rest.entity.InvoiceProduct;
 import com.nogayhusrev.accounting_rest.entity.Product;
 import com.nogayhusrev.accounting_rest.enums.InvoiceType;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.service.common.CrudService;
 
 import java.util.List;
@@ -13,9 +14,9 @@ public interface InvoiceProductService extends CrudService<InvoiceProductDto, Lo
 
     List<InvoiceProduct> findInvoiceProductsByInvoiceType(InvoiceType invoiceType);
 
-    void saveInvoiceProductByInvoiceId(InvoiceProductDto invoiceProductDto, Long invoiceId);
+    void saveInvoiceProductByInvoiceId(InvoiceProductDto invoiceProductDto, Long invoiceId) throws AccountingProjectException;
 
-    void completeApprovalProcedures(Long invoiceId, InvoiceType type);
+    void completeApprovalProcedures(Long invoiceId, InvoiceType type) throws AccountingProjectException;
 
     boolean checkProductQuantity(InvoiceProductDto salesInvoiceProduct);
 

@@ -8,6 +8,7 @@ import com.nogayhusrev.accounting_rest.entity.Invoice;
 import com.nogayhusrev.accounting_rest.enums.ClientVendorType;
 import com.nogayhusrev.accounting_rest.enums.InvoiceStatus;
 import com.nogayhusrev.accounting_rest.enums.InvoiceType;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.repository.InvoiceRepository;
 import com.nogayhusrev.accounting_rest.service.ClientVendorService;
@@ -94,14 +95,14 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public List<ClientVendorDto> findVendors() {
+    public List<ClientVendorDto> findVendors() throws AccountingProjectException {
         return clientVendorService.findAll().stream()
                 .filter(clientVendorDto -> clientVendorDto.getClientVendorType().getValue().equalsIgnoreCase(ClientVendorType.VENDOR.getValue()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ClientVendorDto> findClients() {
+    public List<ClientVendorDto> findClients() throws AccountingProjectException {
         return clientVendorService.findAll().stream()
                 .filter(clientVendorDto -> clientVendorDto.getClientVendorType().getValue().equalsIgnoreCase(ClientVendorType.CLIENT.getValue()))
                 .collect(Collectors.toList());
@@ -134,7 +135,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public void approve(Long invoiceId) {
+    public void approve(Long invoiceId) throws AccountingProjectException {
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
 
         invoiceProductService.completeApprovalProcedures(invoiceId, invoice.getInvoiceType());
@@ -181,7 +182,13 @@ public class InvoiceServiceImpl implements InvoiceService {
     public void delete(Long invoiceId) {
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
         invoiceProductService.findInvoiceProductsByInvoiceId(invoiceId)
-                .forEach(invoiceProductDto -> invoiceProductService.delete(invoiceProductDto.getId()));
+                .forEach(invoiceProductDto -> {
+                    try {
+                        invoiceProductService.delete(invoiceProductDto.getId());
+                    } catch (AccountingProjectException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
         invoice.setIsDeleted(true);
         invoice.setInvoiceNo(invoice.getInvoiceNo() + "_DELETED");
         invoiceRepository.save(invoice);

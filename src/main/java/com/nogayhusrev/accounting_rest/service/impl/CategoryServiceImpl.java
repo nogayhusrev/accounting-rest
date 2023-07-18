@@ -1,8 +1,11 @@
 package com.nogayhusrev.accounting_rest.service.impl;
 
 import com.nogayhusrev.accounting_rest.dto.CategoryDto;
+import com.nogayhusrev.accounting_rest.dto.UserDto;
 import com.nogayhusrev.accounting_rest.entity.Category;
 import com.nogayhusrev.accounting_rest.entity.Company;
+import com.nogayhusrev.accounting_rest.entity.User;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.repository.CategoryRepository;
 import com.nogayhusrev.accounting_rest.service.CategoryService;
@@ -33,8 +36,15 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public CategoryDto findById(Long categoryId) {
-        return mapperUtil.convert(categoryRepository.findById(categoryId).get(), new CategoryDto());
+    public CategoryDto findById(Long categoryId) throws AccountingProjectException {
+
+        Category category = categoryRepository.findById(categoryId).get();
+
+        if (category.getCompany().getTitle().equals(userService.getCurrentUser().getCompany().getTitle()))
+            return mapperUtil.convert(category, new CategoryDto());
+
+        throw new  AccountingProjectException("Category Not Found");
+
     }
 
     @Override
@@ -47,8 +57,12 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(category -> {
 
                     CategoryDto categoryDto = mapperUtil.convert(category, new CategoryDto());
-                    if (hasProducts(category))
-                        categoryDto.setHasProduct(true);
+                    try {
+                        if (hasProducts(category))
+                            categoryDto.setHasProduct(true);
+                    } catch (AccountingProjectException e) {
+                        throw new RuntimeException(e);
+                    }
 
                     return categoryDto;
 
@@ -56,10 +70,15 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto findByName(String name) {
+    public CategoryDto findByName(String name) throws AccountingProjectException {
+
         Category category = categoryRepository.findAll().stream()
                 .filter(savedCategory -> savedCategory.getDescription().equalsIgnoreCase(name))
+                .filter(savedCategory -> savedCategory.getCompany().getTitle().equals(userService.getCurrentUser().getCompany().getTitle()))
                 .findFirst().get();
+
+        if (category == null)
+            throw new AccountingProjectException("Category Not Found");
 
         return mapperUtil.convert(category, new CategoryDto());
     }
@@ -74,7 +93,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void delete(Long categoryId) {
+    public void delete(Long categoryId) throws AccountingProjectException {
         Category category = categoryRepository.findById(categoryId).get();
 
         if (hasProducts(category))
@@ -86,7 +105,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
 
-    private boolean hasProducts(Category category) {
+    private boolean hasProducts(Category category) throws AccountingProjectException {
         return productService.findAll().stream()
                 .filter(productDto -> productDto.getCategory().getDescription().equalsIgnoreCase(category.getDescription()))
                 .count() > 0;

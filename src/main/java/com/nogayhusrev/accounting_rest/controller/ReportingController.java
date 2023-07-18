@@ -3,6 +3,7 @@ package com.nogayhusrev.accounting_rest.controller;
 
 import com.nogayhusrev.accounting_rest.dto.InvoiceProductDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.service.ReportingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -41,7 +42,7 @@ public class ReportingController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> getStock() {
+    public ResponseEntity<ResponseWrapper> getStock() throws AccountingProjectException {
 
         List<InvoiceProductDto> stock = reportingService.getStock();
         return ResponseEntity.ok(new ResponseWrapper("Stock successfully retrieved", stock, HttpStatus.OK));

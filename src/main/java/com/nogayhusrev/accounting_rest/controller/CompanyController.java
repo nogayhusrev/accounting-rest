@@ -4,6 +4,7 @@ package com.nogayhusrev.accounting_rest.controller;
 import com.nogayhusrev.accounting_rest.client.AddressClient;
 import com.nogayhusrev.accounting_rest.dto.CompanyDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.service.AddressService;
 import com.nogayhusrev.accounting_rest.service.CompanyService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -115,7 +116,7 @@ public class CompanyController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> activate(@PathVariable Long companyId) {
+    public ResponseEntity<ResponseWrapper> activate(@PathVariable Long companyId) throws AccountingProjectException {
 
 
         companyService.activate(companyId);
@@ -135,7 +136,7 @@ public class CompanyController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> deactivate(@PathVariable Long companyId) {
+    public ResponseEntity<ResponseWrapper> deactivate(@PathVariable Long companyId) throws AccountingProjectException {
 
 
         companyService.deactivate(companyId);

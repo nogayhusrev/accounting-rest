@@ -1,6 +1,7 @@
 package com.nogayhusrev.accounting_rest.converter;
 
 import com.nogayhusrev.accounting_rest.dto.UserDto;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.service.UserService;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.context.annotation.Lazy;
@@ -24,7 +25,11 @@ public class UserDtoConverter implements Converter<String, UserDto> {
         // it throws error if user selects "Select" even with @SneakyThrows
         if (id == null || id.isBlank())
             return null;
-        return userService.findById(Long.parseLong(id));
+        try {
+            return userService.findById(Long.parseLong(id));
+        } catch (AccountingProjectException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

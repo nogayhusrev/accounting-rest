@@ -4,6 +4,7 @@ package com.nogayhusrev.accounting_rest.service.impl;
 import com.nogayhusrev.accounting_rest.dto.UserDto;
 import com.nogayhusrev.accounting_rest.entity.Company;
 import com.nogayhusrev.accounting_rest.entity.User;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.repository.UserRepository;
 import com.nogayhusrev.accounting_rest.service.SecurityService;
@@ -33,14 +34,14 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserDto findById(Long userId) {
+    public UserDto findById(Long userId) throws AccountingProjectException {
 
         User user = userRepository.findUserById(userId);
 
         if (user.getCompany().getTitle().equals(getCurrentUser().getCompany().getTitle()))
             return mapperUtil.convert(user, new UserDto());
 
-        return null;
+        throw new AccountingProjectException("User Not Found");
     }
 
     @Override
@@ -73,14 +74,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto findByName(String username) {
+    public UserDto findByName(String username) throws AccountingProjectException {
 
         User user = userRepository.findUserByUsername(username);
 
         if (user.getCompany().getTitle().equals(getCurrentUser().getCompany().getTitle()))
             return mapperUtil.convert(user, new UserDto());
 
-        return null;
+        throw new AccountingProjectException("User Not Found");
 
     }
 
@@ -97,7 +98,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(Long userId) {
+    public void delete(Long userId) throws AccountingProjectException {
 
         UserDto userDto = findById(userId);
 

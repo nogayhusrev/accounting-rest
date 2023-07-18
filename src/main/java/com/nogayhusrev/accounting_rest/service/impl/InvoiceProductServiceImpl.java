@@ -7,6 +7,7 @@ import com.nogayhusrev.accounting_rest.entity.Invoice;
 import com.nogayhusrev.accounting_rest.entity.InvoiceProduct;
 import com.nogayhusrev.accounting_rest.entity.Product;
 import com.nogayhusrev.accounting_rest.enums.InvoiceType;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.repository.InvoiceProductRepository;
 import com.nogayhusrev.accounting_rest.service.InvoiceProductService;
@@ -62,7 +63,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
 
     @Override
-    public void saveInvoiceProductByInvoiceId(InvoiceProductDto invoiceProductDto, Long invoiceId) {
+    public void saveInvoiceProductByInvoiceId(InvoiceProductDto invoiceProductDto, Long invoiceId) throws AccountingProjectException {
         Invoice invoice = mapperUtil.convert(invoiceService.findById(invoiceId), new Invoice());
         InvoiceProduct invoiceProduct = mapperUtil.convert(invoiceProductDto, new InvoiceProduct());
         invoiceProduct.setInvoice(invoice);
@@ -71,7 +72,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public void completeApprovalProcedures(Long invoiceId, InvoiceType type) {
+    public void completeApprovalProcedures(Long invoiceId, InvoiceType type) throws AccountingProjectException {
         List<InvoiceProduct> invoiceProductList = invoiceProductRepository.findAllByInvoice_Id(invoiceId);
         if (type == InvoiceType.SALES) {
             for (InvoiceProduct salesInvoiceProduct : invoiceProductList) {
@@ -155,7 +156,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
 
-    private void updateQuantityOfProduct(InvoiceProduct invoiceProduct, InvoiceType type) {
+    private void updateQuantityOfProduct(InvoiceProduct invoiceProduct, InvoiceType type) throws AccountingProjectException {
         ProductDto productDto = mapperUtil.convert(invoiceProduct.getProduct(), new ProductDto());
         if (type.equals(InvoiceType.SALES)) {
             productDto.setQuantityInStock(productDto.getQuantityInStock() - invoiceProduct.getQuantity());
