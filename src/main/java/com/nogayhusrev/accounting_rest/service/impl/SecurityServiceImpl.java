@@ -4,9 +4,9 @@ import com.nogayhusrev.accounting_rest.config.KeycloakProperties;
 import com.nogayhusrev.accounting_rest.dto.UserDto;
 import com.nogayhusrev.accounting_rest.entity.User;
 import com.nogayhusrev.accounting_rest.entity.common.UserPrincipal;
+import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.repository.UserRepository;
 import com.nogayhusrev.accounting_rest.service.SecurityService;
-import com.nogayhusrev.accounting_rest.service.UserService;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -35,13 +35,13 @@ import static org.keycloak.admin.client.CreatedResponseUtil.getCreatedId;
 public class SecurityServiceImpl implements SecurityService {
     private final UserRepository userRepository;
 
-    private final UserService userService;
+    private final MapperUtil mapperUtil;
 
     private final KeycloakProperties keycloakProperties;
 
-    public SecurityServiceImpl(UserRepository userRepository, UserService userService, KeycloakProperties keycloakProperties) {
+    public SecurityServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, KeycloakProperties keycloakProperties) {
         this.userRepository = userRepository;
-        this.userService = userService;
+        this.mapperUtil = mapperUtil;
         this.keycloakProperties = keycloakProperties;
     }
 
@@ -68,8 +68,10 @@ public class SecurityServiceImpl implements SecurityService {
         KeycloakPrincipal<KeycloakSecurityContext> kPrincipal = (KeycloakPrincipal<KeycloakSecurityContext>) principal;
         IDToken token = kPrincipal.getKeycloakSecurityContext().getToken();
 
+        User user = userRepository.findUserByUsername(token.getPreferredUsername());
 
-        return userService.findByName(token.getPreferredUsername());
+
+        return mapperUtil.convert(user, new UserDto());
     }
 
     @Override

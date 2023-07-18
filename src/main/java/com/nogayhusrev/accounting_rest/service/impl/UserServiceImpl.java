@@ -34,12 +34,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findById(Long userId) {
-        return mapperUtil.convert(userRepository.findUserById(userId), new UserDto());
-    }
 
-    @Override
-    public UserDto findByUsername(String username) {
-        return mapperUtil.convert(userRepository.findUserByUsername(username), new UserDto());
+        User user = userRepository.findUserById(userId);
+
+        if (user.getCompany().getTitle().equals(getCurrentUser().getCompany().getTitle()))
+            return mapperUtil.convert(user, new UserDto());
+
+        return null;
     }
 
     @Override
@@ -73,11 +74,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findByName(String username) {
-        User user = userRepository.findAll().stream()
-                .filter(savedUser -> savedUser.getUsername().equalsIgnoreCase(username))
-                .findFirst().get();
 
-        return mapperUtil.convert(user, new UserDto());
+        User user = userRepository.findUserByUsername(username);
+
+        if (user.getCompany().getTitle().equals(getCurrentUser().getCompany().getTitle()))
+            return mapperUtil.convert(user, new UserDto());
+
+        return null;
+
     }
 
     @Override
