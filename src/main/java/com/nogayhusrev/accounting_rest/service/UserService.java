@@ -6,6 +6,7 @@ import com.nogayhusrev.accounting_rest.service.common.CrudService;
 public interface UserService extends CrudService<UserDto, Long> {
 
     UserDto getCurrentUser();
+    UserDto findByUsername(String username);
 
 
 }
