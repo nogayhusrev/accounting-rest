@@ -3,12 +3,14 @@ package com.nogayhusrev.accounting_rest.controller;
 
 import com.nogayhusrev.accounting_rest.dto.CategoryDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -65,10 +67,10 @@ public class CategoryController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> create(@RequestBody CategoryDto categoryDto) throws Exception {
+    public ResponseEntity<ResponseWrapper> create(@RequestBody CategoryDto categoryDto) throws AccountingProjectException {
 
         if (categoryService.isExist(categoryDto)) {
-            throw new Exception("This category description already exists");
+            throw new AccountingProjectException("This category description already exists");
         }
 
         categoryService.save(categoryDto);
@@ -85,11 +87,11 @@ public class CategoryController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> update(@RequestBody CategoryDto categoryDto, @PathVariable Long categoryId) throws Exception {
+    public ResponseEntity<ResponseWrapper> update(@RequestBody CategoryDto categoryDto, @PathVariable Long categoryId) throws AccountingProjectException {
 
 
         if (categoryService.isExist(categoryDto, categoryId)) {
-            throw new Exception("This category description already exists");
+            throw new AccountingProjectException("This category description already exists");
         }
 
         categoryService.update(categoryDto, categoryId);
@@ -107,10 +109,10 @@ public class CategoryController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long categoryId) throws Exception {
+    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long categoryId) throws AccountingProjectException {
 
         if (categoryService.findById(categoryId).isHasProduct()) {
-            throw new Exception("This category has products.");
+            throw new AccountingProjectException("This category has products.");
         }
 
         categoryService.delete(categoryId);

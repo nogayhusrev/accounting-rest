@@ -9,6 +9,7 @@ import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.service.InvoiceProductService;
 import com.nogayhusrev.accounting_rest.service.ReportingService;
+import com.nogayhusrev.accounting_rest.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,14 +26,20 @@ public class ReportingServiceImpl implements ReportingService {
 
     private final MapperUtil mapperUtil;
 
-    public ReportingServiceImpl(InvoiceProductService invoiceProductService, MapperUtil mapperUtil) {
+    private final UserService userService;
+
+    public ReportingServiceImpl(InvoiceProductService invoiceProductService, MapperUtil mapperUtil, UserService userService) {
         this.invoiceProductService = invoiceProductService;
         this.mapperUtil = mapperUtil;
+        this.userService = userService;
     }
 
 
     @Override
     public List<InvoiceProductDto> getStock() throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         return invoiceProductService.findAll().stream()
                 .filter(invoiceProductDto -> invoiceProductDto.getInvoice().getInvoiceStatus().equals(InvoiceStatus.APPROVED))
                 .sorted(Comparator.comparing(InvoiceProductDto::getId).reversed())
@@ -40,7 +47,10 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
-    public Map<String, BigDecimal> getProfitLoss() {
+    public Map<String, BigDecimal> getProfitLoss() throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         Map<String, BigDecimal> profitLossMap = new HashMap<>();
 
         List<InvoiceProduct> salesInvoiceProducts = invoiceProductService.findInvoiceProductsByInvoiceType(InvoiceType.SALES);
@@ -55,5 +65,10 @@ public class ReportingServiceImpl implements ReportingService {
         return profitLossMap;
     }
 
+    private boolean isNotAdminOrManager() {
+        return !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Manager")
+                &&
+                !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Employee");
+    }
 
 }

@@ -12,29 +12,29 @@ import java.util.List;
 
 public interface InvoiceService extends CrudService<InvoiceDto, Long> {
 
-    List<InvoiceDto> findPurchaseInvoices();
+    List<InvoiceDto> findPurchaseInvoices() throws AccountingProjectException;
 
-    List<InvoiceDto> findSaleInvoices();
+    List<InvoiceDto> findSaleInvoices() throws AccountingProjectException;
 
     List<ClientVendorDto> findVendors() throws AccountingProjectException;
 
     List<ClientVendorDto> findClients() throws AccountingProjectException;
 
-    String generateInvoiceNo(InvoiceType invoiceType);
+    String generateInvoiceNo(InvoiceType invoiceType) throws AccountingProjectException;
 
-    void save(InvoiceDto invoiceDto, InvoiceType invoiceType);
+    void save(InvoiceDto invoiceDto, InvoiceType invoiceType) throws AccountingProjectException;
 
     void approve(Long invoiceId) throws AccountingProjectException;
 
-    List<InvoiceDto> findLastThreeInvoices();
+    List<InvoiceDto> findLastThreeInvoices() throws AccountingProjectException;
 
-    List<InvoiceDto> findInvoiceByInvoiceStatus(InvoiceStatus invoiceStatus);
+    List<InvoiceDto> findInvoiceByInvoiceStatus(InvoiceStatus invoiceStatus) throws AccountingProjectException;
 
-    void printInvoice(Long invoiceId);
+    void printInvoice(Long invoiceId) throws AccountingProjectException;
 
-    BigDecimal getTotalPriceOfInvoice(Long invoiceId);
+    BigDecimal getTotalPriceOfInvoice(Long invoiceId) throws AccountingProjectException;
 
-    BigDecimal getTotalTaxOfInvoice(Long invoiceId);
+    BigDecimal getTotalTaxOfInvoice(Long invoiceId) throws AccountingProjectException;
 
-    BigDecimal getProfitLossOfInvoice(Long invoiceId);
+    BigDecimal getProfitLossOfInvoice(Long invoiceId) throws AccountingProjectException;
 }

@@ -10,9 +10,9 @@ import com.nogayhusrev.accounting_rest.service.common.CrudService;
 import java.util.List;
 
 public interface InvoiceProductService extends CrudService<InvoiceProductDto, Long> {
-    List<InvoiceProductDto> findInvoiceProductsByInvoiceId(Long invoiceId);
+    List<InvoiceProductDto> findInvoiceProductsByInvoiceId(Long invoiceId) throws AccountingProjectException;
 
-    List<InvoiceProduct> findInvoiceProductsByInvoiceType(InvoiceType invoiceType);
+    List<InvoiceProduct> findInvoiceProductsByInvoiceType(InvoiceType invoiceType) throws AccountingProjectException;
 
     void saveInvoiceProductByInvoiceId(InvoiceProductDto invoiceProductDto, Long invoiceId) throws AccountingProjectException;
 
@@ -20,8 +20,8 @@ public interface InvoiceProductService extends CrudService<InvoiceProductDto, Lo
 
     boolean checkProductQuantity(InvoiceProductDto salesInvoiceProduct);
 
-    List<InvoiceProduct> findInvoiceProductsByInvoiceTypeAndProductRemainingQuantity(InvoiceType type, Product product, Integer remainingQuantity);
+    List<InvoiceProduct> findInvoiceProductsByInvoiceTypeAndProductRemainingQuantity(InvoiceType type, Product product, Integer remainingQuantity) throws AccountingProjectException;
 
-    List<InvoiceProduct> findAllInvoiceProductsByProductId(Long id);
+    List<InvoiceProduct> findAllInvoiceProductsByProductId(Long id) throws AccountingProjectException;
 
 }

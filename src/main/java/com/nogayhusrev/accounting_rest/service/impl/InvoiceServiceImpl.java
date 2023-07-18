@@ -45,15 +45,26 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
     @Override
-    public InvoiceDto findById(Long invoiceId) {
-        InvoiceDto invoiceDto = mapperUtil.convert(invoiceRepository.findById(invoiceId).get(), new InvoiceDto());
-        invoiceDto.setInvoiceProducts(new ArrayList<>());
-        return invoiceDto;
+    public InvoiceDto findById(Long invoiceId) throws AccountingProjectException {
+
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+        Invoice invoice = invoiceRepository.findById(invoiceId).get();
+
+        if (invoice.getCompany().getTitle().equals(userService.getCurrentUser().getCompany().getTitle()))
+            return mapperUtil.convert(invoice, new InvoiceDto());
+
+        throw new AccountingProjectException("Invoice Not Found");
 
     }
 
     @Override
-    public List<InvoiceDto> findAll() {
+    public List<InvoiceDto> findAll() throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+
         Company currentUserCompany = mapperUtil.convert(userService.getCurrentUser().getCompany(), new Company());
 
         return invoiceRepository.findAll().stream()
@@ -64,31 +75,54 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public InvoiceDto findByName(String invoiceNo) {
+    public InvoiceDto findByName(String invoiceNo) throws AccountingProjectException {
+
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+
         Invoice invoice = invoiceRepository.findAll().stream()
                 .filter(savedInvoice -> savedInvoice.getInvoiceNo().equals(invoiceNo))
                 .findFirst().get();
 
-        return mapperUtil.convert(invoice, new InvoiceDto());
+        if (invoice.getCompany().getTitle().equals(userService.getCurrentUser().getCompany().getTitle()))
+            return mapperUtil.convert(invoice, new InvoiceDto());
+
+        throw new AccountingProjectException("Invoice Not Found");
+
     }
 
     @Override
-    public List<InvoiceDto> findPurchaseInvoices() {
+    public List<InvoiceDto> findPurchaseInvoices() throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         return findAll().stream()
                 .filter(invoice -> invoice.getInvoiceType().getValue().equals(InvoiceType.PURCHASE.getValue()))
                 .map(invoiceDto -> {
-                    invoiceDto.setInvoiceProducts(invoiceProductService.findInvoiceProductsByInvoiceId(invoiceDto.getId()));
+                    try {
+                        invoiceDto.setInvoiceProducts(invoiceProductService.findInvoiceProductsByInvoiceId(invoiceDto.getId()));
+                    } catch (AccountingProjectException e) {
+                        throw new RuntimeException(e);
+                    }
                     return invoiceDto;
                 })
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<InvoiceDto> findSaleInvoices() {
+    public List<InvoiceDto> findSaleInvoices() throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         return findAll().stream()
                 .filter(invoice -> invoice.getInvoiceType().getValue().equals(InvoiceType.SALES.getValue()))
                 .map(invoiceDto -> {
-                    invoiceDto.setInvoiceProducts(invoiceProductService.findInvoiceProductsByInvoiceId(invoiceDto.getId()));
+                    try {
+                        invoiceDto.setInvoiceProducts(invoiceProductService.findInvoiceProductsByInvoiceId(invoiceDto.getId()));
+                    } catch (AccountingProjectException e) {
+                        throw new RuntimeException(e);
+                    }
                     return invoiceDto;
                 })
                 .collect(Collectors.toList());
@@ -96,20 +130,31 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<ClientVendorDto> findVendors() throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         return clientVendorService.findAll().stream()
                 .filter(clientVendorDto -> clientVendorDto.getClientVendorType().getValue().equalsIgnoreCase(ClientVendorType.VENDOR.getValue()))
+                .filter(clientVendorDto -> clientVendorDto.getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<ClientVendorDto> findClients() throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         return clientVendorService.findAll().stream()
                 .filter(clientVendorDto -> clientVendorDto.getClientVendorType().getValue().equalsIgnoreCase(ClientVendorType.CLIENT.getValue()))
+                .filter(clientVendorDto -> clientVendorDto.getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public String generateInvoiceNo(InvoiceType invoiceType) {
+    public String generateInvoiceNo(InvoiceType invoiceType) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
 
         Company company = mapperUtil.convert(userService.getCurrentUser().getCompany(), new Company());
         List<Invoice> invoices = invoiceRepository.findInvoicesByCompanyAndInvoiceType(company, invoiceType);
@@ -124,7 +169,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public void save(InvoiceDto invoiceDto, InvoiceType invoiceType) {
+    public void save(InvoiceDto invoiceDto, InvoiceType invoiceType) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         invoiceDto.setInvoiceType(invoiceType);
         invoiceDto.setInvoiceProducts(new ArrayList<>());
         invoiceDto.setDate(LocalDate.now());
@@ -136,7 +184,14 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void approve(Long invoiceId) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
+
+        if (!invoice.getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            throw new AccountingProjectException("Invoice Not Found");
 
         invoiceProductService.completeApprovalProcedures(invoiceId, invoice.getInvoiceType());
 
@@ -147,7 +202,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public List<InvoiceDto> findLastThreeInvoices() {
+    public List<InvoiceDto> findLastThreeInvoices() throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         return findAll().stream()
                 .sorted(Comparator.comparing(InvoiceDto::getId).reversed())
                 .limit(3)
@@ -155,8 +213,12 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public List<InvoiceDto> findInvoiceByInvoiceStatus(InvoiceStatus invoiceStatus) {
+    public List<InvoiceDto> findInvoiceByInvoiceStatus(InvoiceStatus invoiceStatus) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         Company company = mapperUtil.convert(userService.getCurrentUser().getCompany(), new Company());
+
         return invoiceRepository.findAll().stream()
                 .filter(invoice -> invoice.getCompany().getTitle().equalsIgnoreCase(company.getTitle()))
                 .filter(invoice -> invoice.getInvoiceStatus().equals(invoiceStatus))
@@ -165,7 +227,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public void printInvoice(Long invoiceId) {
+    public void printInvoice(Long invoiceId) throws AccountingProjectException {
 
         InvoiceDto invoiceDto = mapperUtil.convert(invoiceRepository.findById(invoiceId).get(), new InvoiceDto());
         calculateInvoiceDetails(invoiceDto);
@@ -174,13 +236,20 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
     @Override
-    public void save(InvoiceDto invoiceDto) {
-        throw new IllegalStateException("NOT IMPLEMENTED");
+    public void save(InvoiceDto invoiceDto) throws AccountingProjectException {
+        throw new AccountingProjectException("SAVE METHOD NOT IMPLEMENTED");
     }
 
     @Override
-    public void delete(Long invoiceId) {
+    public void delete(Long invoiceId) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
+
+        if (!invoice.getCompany().getTitle().equals(userService.getCurrentUser().getCompany().getTitle()))
+            throw new AccountingProjectException("Invoice Not Found");
+
         invoiceProductService.findInvoiceProductsByInvoiceId(invoiceId)
                 .forEach(invoiceProductDto -> {
                     try {
@@ -196,7 +265,14 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
     @Override
-    public void update(InvoiceDto invoiceDto, Long invoiceId) {
+    public void update(InvoiceDto invoiceDto, Long invoiceId) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+        if (!invoiceDto.getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            throw new AccountingProjectException("Invoice Not Found");
+
+
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
 
         invoiceDto.setInvoiceNo(invoice.getInvoiceNo());
@@ -222,14 +298,14 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .count() > 0;
     }
 
-    private void calculateInvoiceDetails(InvoiceDto invoiceDto) {
+    private void calculateInvoiceDetails(InvoiceDto invoiceDto) throws AccountingProjectException {
         invoiceDto.setPrice(getTotalPriceOfInvoice(invoiceDto.getId()));
         invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()));
         invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()).add(getTotalTaxOfInvoice(invoiceDto.getId())));
     }
 
     @Override
-    public BigDecimal getTotalPriceOfInvoice(Long invoiceId) {
+    public BigDecimal getTotalPriceOfInvoice(Long invoiceId) throws AccountingProjectException {
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
         List<InvoiceProductDto> invoiceProductsOfInvoice = invoiceProductService.findInvoiceProductsByInvoiceId(invoice.getId());
         return invoiceProductsOfInvoice.stream()
@@ -239,7 +315,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public BigDecimal getTotalTaxOfInvoice(Long invoiceId) {
+    public BigDecimal getTotalTaxOfInvoice(Long invoiceId) throws AccountingProjectException {
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
         List<InvoiceProductDto> invoiceProductsOfInvoice = invoiceProductService.findInvoiceProductsByInvoiceId(invoice.getId());
         return invoiceProductsOfInvoice.stream()
@@ -251,12 +327,18 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public BigDecimal getProfitLossOfInvoice(Long invoiceId) {
+    public BigDecimal getProfitLossOfInvoice(Long invoiceId) throws AccountingProjectException {
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
         List<InvoiceProductDto> invoiceProductsOfInvoice = invoiceProductService.findInvoiceProductsByInvoiceId(invoice.getId());
         return invoiceProductsOfInvoice.stream()
                 .map(InvoiceProductDto::getProfitLoss)
                 .reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
+    }
+
+    private boolean isNotAdminOrManager() {
+        return !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Manager")
+                &&
+                !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Employee");
     }
 
 

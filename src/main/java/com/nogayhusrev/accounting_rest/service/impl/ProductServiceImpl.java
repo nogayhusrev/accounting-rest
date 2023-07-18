@@ -3,6 +3,7 @@ package com.nogayhusrev.accounting_rest.service.impl;
 import com.nogayhusrev.accounting_rest.dto.ProductDto;
 import com.nogayhusrev.accounting_rest.entity.Company;
 import com.nogayhusrev.accounting_rest.entity.Product;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.repository.ProductRepository;
 import com.nogayhusrev.accounting_rest.service.ProductService;
@@ -28,12 +29,24 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public ProductDto findById(Long productId) {
-        return mapperUtil.convert(productRepository.findById(productId).get(), new ProductDto());
+    public ProductDto findById(Long productId) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+        Product product = productRepository.findById(productId).get();
+
+        if (product.getCategory().getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            return mapperUtil.convert(product, new ProductDto());
+
+        throw new AccountingProjectException("Product Not Found");
     }
 
     @Override
-    public List<ProductDto> findAll() {
+    public List<ProductDto> findAll() throws AccountingProjectException {
+
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         Company company = mapperUtil.convert(userService.getCurrentUser().getCompany(), new Company());
         return productRepository.findAll().stream()
                 .filter(product -> product.getCategory().getCompany().getTitle().equalsIgnoreCase(company.getTitle()))
@@ -43,16 +56,25 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto findByName(String name) {
+    public ProductDto findByName(String name) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         Product product = productRepository.findAll().stream()
                 .filter(savedProduct -> savedProduct.getName().equalsIgnoreCase(name))
                 .findFirst().get();
 
-        return mapperUtil.convert(product, new ProductDto());
+        if (product.getCategory().getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            return mapperUtil.convert(product, new ProductDto());
+
+        throw new AccountingProjectException("Product Not Found");
     }
 
     @Override
-    public void save(ProductDto productDto) {
+    public void save(ProductDto productDto) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         Product product = mapperUtil.convert(productDto, new Product());
         product.setQuantityInStock(0);
         productRepository.save(product);
@@ -60,11 +82,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void delete(Long productId) {
+    public void delete(Long productId) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+
         Product product = productRepository.findById(productId).get();
 
+        if (!product.getCategory().getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            throw new AccountingProjectException("Product Not Found");
+
         if (product.getQuantityInStock() > 0)
-            return;
+            throw new AccountingProjectException("Product Has Stock, Not Deleted");
 
         product.setIsDeleted(true);
         product.setName(product.getName() + "_" + product.getId() + "_DELETED");
@@ -73,7 +102,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void update(ProductDto productDto, Long productId) {
+    public void update(ProductDto productDto, Long productId) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+        Product product = productRepository.findById(productId).get();
+
+        if (!product.getCategory().getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            throw new AccountingProjectException("Product Not Found");
+
         productDto.setId(productId);
         productRepository.save(mapperUtil.convert(productDto, new Product()));
     }
@@ -93,5 +130,11 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll().stream()
                 .filter(savedProduct -> savedProduct.getName().equalsIgnoreCase(productDto.getName()))
                 .count() > 0;
+    }
+
+    private boolean isNotAdminOrManager() {
+        return !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Manager")
+                &&
+                !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Employee");
     }
 }

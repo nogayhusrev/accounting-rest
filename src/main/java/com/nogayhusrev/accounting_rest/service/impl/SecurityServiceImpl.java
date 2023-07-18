@@ -123,6 +123,10 @@ public class SecurityServiceImpl implements SecurityService {
         RealmResource realmResource = keycloak.realm(keycloakProperties.getRealm());
         UsersResource usersResource = realmResource.users();
 
+
+//        usersResource.delete(userName);
+
+
         List<UserRepresentation> userRepresentations = usersResource.search(userName);
         String uid = userRepresentations.get(0).getId();
         usersResource.delete(uid);

@@ -11,6 +11,6 @@ public interface ReportingService {
 
     List<InvoiceProductDto> getStock() throws AccountingProjectException;
 
-    Map<String, BigDecimal> getProfitLoss();
+    Map<String, BigDecimal> getProfitLoss() throws AccountingProjectException;
 
 }

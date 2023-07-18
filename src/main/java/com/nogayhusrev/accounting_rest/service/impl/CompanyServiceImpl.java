@@ -1,9 +1,7 @@
 package com.nogayhusrev.accounting_rest.service.impl;
 
 
-import com.nogayhusrev.accounting_rest.dto.ClientVendorDto;
 import com.nogayhusrev.accounting_rest.dto.CompanyDto;
-import com.nogayhusrev.accounting_rest.entity.ClientVendor;
 import com.nogayhusrev.accounting_rest.entity.Company;
 import com.nogayhusrev.accounting_rest.enums.CompanyStatus;
 import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
@@ -11,7 +9,6 @@ import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.repository.CompanyRepository;
 import com.nogayhusrev.accounting_rest.service.CompanyService;
 import com.nogayhusrev.accounting_rest.service.UserService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -27,8 +24,6 @@ public class CompanyServiceImpl implements CompanyService {
 
     private final UserService userService;
 
-    @Value("company")
-    private String companyName;
 
     public CompanyServiceImpl(CompanyRepository companyRepository, MapperUtil mapperUtil, UserService userService) {
         this.companyRepository = companyRepository;
@@ -40,30 +35,18 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public CompanyDto findById(Long companyId) throws AccountingProjectException {
 
-        Company company = companyRepository.findById(companyId).get();
 
-        if (company.getTitle().equals(companyName))
-            return mapperUtil.convert(companyRepository.findById(companyId).get(), new CompanyDto());
+        if (isNotRoot())
+            throw new AccountingProjectException("You Are Not Root");
 
-        throw new AccountingProjectException("Company Not Found");
+        Company company;
 
-    }
+        try {
+            company = companyRepository.findById(companyId).get();
+        } catch (Exception e) {
+            throw new AccountingProjectException("Company Not Found");
+        }
 
-    @Override
-    public List<CompanyDto> findAll() {
-        return companyRepository.findAll()
-                .stream()
-                .filter(company -> company.getId() != 1)
-                .sorted(Comparator.comparing(Company::getCompanyStatus).thenComparing(Company::getTitle))
-                .map(each -> mapperUtil.convert(each, new CompanyDto()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public CompanyDto findByName(String name) {
-        Company company = companyRepository.findAll().stream()
-                .filter(savedCompany -> savedCompany.getTitle().equalsIgnoreCase(name))
-                .findFirst().get();
 
         return mapperUtil.convert(company, new CompanyDto());
 
@@ -71,21 +54,84 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public void save(CompanyDto companyDto) {
+    public List<CompanyDto> findAll() throws AccountingProjectException {
+
+        if (isNotRoot())
+            throw new AccountingProjectException("You Are Not Root");
+
+        List<CompanyDto> companyDtoList;
+
+        try {
+            companyDtoList = companyRepository.findAll()
+                    .stream()
+                    .filter(company -> company.getId() != 1)
+                    .sorted(Comparator.comparing(Company::getCompanyStatus).thenComparing(Company::getTitle))
+                    .map(each -> mapperUtil.convert(each, new CompanyDto()))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new AccountingProjectException("Company Not Found");
+        }
+
+        return companyDtoList;
+
+    }
+
+    @Override
+    public CompanyDto findByName(String name) throws AccountingProjectException {
+
+        if (isNotRoot())
+            throw new AccountingProjectException("You Are Not Root");
+
+        Company company;
+
+        try {
+            company = companyRepository.findAll().stream()
+                    .filter(savedCompany -> savedCompany.getTitle().equalsIgnoreCase(name))
+                    .findFirst().get();
+
+        } catch (Exception e) {
+            throw new AccountingProjectException("Company Not Found");
+        }
+
+
+        return mapperUtil.convert(company, new CompanyDto());
+
+
+    }
+
+    @Override
+    public void save(CompanyDto companyDto) throws AccountingProjectException {
+        if (isNotRoot())
+            throw new AccountingProjectException("You Are Not Root");
+
         companyDto.setCompanyStatus(CompanyStatus.PASSIVE);
         companyRepository.save(mapperUtil.convert(companyDto, new Company()));
 
     }
 
     @Override
-    public void delete(Long companyId) {
-        throw new IllegalStateException("NOT IMPLEMENTED");
+    public void delete(Long companyId) throws AccountingProjectException {
+
+        if (isNotRoot())
+            throw new AccountingProjectException("You Are Not Root");
+
+        throw new AccountingProjectException("DELETE METHOD NOT IMPLEMENTED");
     }
 
     @Override
-    public void update(CompanyDto companyDto, Long companyId) {
+    public void update(CompanyDto companyDto, Long companyId) throws AccountingProjectException {
 
-        Company savedCompany = companyRepository.findById(companyId).get();
+        if (isNotRoot())
+            throw new AccountingProjectException("You Are Not Root");
+
+        Company savedCompany ;
+
+        try {
+            savedCompany = companyRepository.findById(companyId).get();
+        }catch (Exception e){
+            throw new AccountingProjectException("Company Not Found");
+        }
+
         companyDto.setId(companyId);
         companyDto.setCompanyStatus(savedCompany.getCompanyStatus());
         companyDto.getAddress().setId(savedCompany.getAddress().getId());
@@ -116,31 +162,36 @@ public class CompanyServiceImpl implements CompanyService {
 
 
     @Override
-    public void activate(Long companyId) {
-        Company company = companyRepository.findById(companyId).get();
+    public void activate(Long companyId) throws AccountingProjectException {
+        Company company ;
+
+        try {
+            company = companyRepository.findById(companyId).get();
+        }catch (Exception e){
+            throw new AccountingProjectException("Company Not Found");
+        }
+
         company.setCompanyStatus(CompanyStatus.ACTIVE);
         companyRepository.save(company);
     }
 
     @Override
-    public void deactivate(Long companyId) {
-        Company company = companyRepository.findById(companyId).get();
+    public void deactivate(Long companyId) throws AccountingProjectException {
+        Company company ;
+
+        try {
+            company = companyRepository.findById(companyId).get();
+        }catch (Exception e){
+            throw new AccountingProjectException("Company Not Found");
+        }
         company.setCompanyStatus(CompanyStatus.PASSIVE);
         companyRepository.save(company);
     }
 
-    @Override
-    public List<CompanyDto> getCompaniesForCurrentUser() {
-        List<Company> companies;
-        if (userService.getCurrentUser().getRole().getDescription().equals("Root User")) {
-            companies = companyRepository.findAll();
-        } else {
-            companies = companyRepository.findAll().stream()
-                    .filter(company -> company.getTitle().equals(userService.getCurrentUser().getCompany().getTitle()))
-                    .collect(Collectors.toList());
-        }
 
-        return companies.stream().map(company -> mapperUtil.convert(company, new CompanyDto())).collect(Collectors.toList());
+    private boolean isNotRoot() {
+        return !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Root");
     }
+
 
 }

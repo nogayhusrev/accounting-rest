@@ -1,6 +1,8 @@
 package com.nogayhusrev.accounting_rest.service.impl;
 
 import com.nogayhusrev.accounting_rest.entity.common.ChargeRequest;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
+import com.nogayhusrev.accounting_rest.service.UserService;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
@@ -17,12 +19,22 @@ public class StripeServiceImpl {
     @Value("${STRIPE_SECRET_KEY}")
     private String secretKey;
 
+    private final UserService userService;
+
+    public StripeServiceImpl(UserService userService) {
+        this.userService = userService;
+    }
+
     @PostConstruct
     public void init() {
         Stripe.apiKey = secretKey;
     }
 
-    public Charge charge(ChargeRequest chargeRequest) throws StripeException {
+    public Charge charge(ChargeRequest chargeRequest) throws StripeException, AccountingProjectException {
+        if (isNotAdmin())
+            throw new AccountingProjectException("You Are Not Admin");
+
+
         Map<String, Object> chargeParams = new HashMap<>();
 
         chargeParams.put("amount", chargeRequest.getAmount());
@@ -31,5 +43,9 @@ public class StripeServiceImpl {
         chargeParams.put("source", chargeRequest.getStripeToken());
 
         return Charge.create(chargeParams);
+    }
+
+    private boolean isNotAdmin() {
+        return !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Admin");
     }
 }

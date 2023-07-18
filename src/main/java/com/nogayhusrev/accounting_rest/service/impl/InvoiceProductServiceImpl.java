@@ -41,8 +41,15 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
 
     @Override
-    public List<InvoiceProductDto> findInvoiceProductsByInvoiceId(Long invoiceId) {
-        return invoiceProductRepository.findInvoiceProductsByInvoiceId(invoiceId).stream()
+    public List<InvoiceProductDto> findInvoiceProductsByInvoiceId(Long invoiceId) throws AccountingProjectException {
+
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+        if (!invoiceService.findById(invoiceId).getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            throw new AccountingProjectException("Invoice Not Found");
+
+        List<InvoiceProductDto> invoiceProductDtoList = invoiceProductRepository.findInvoiceProductsByInvoiceId(invoiceId).stream()
                 .sorted(Comparator.comparing((InvoiceProduct each) -> each.getInvoice().getInvoiceNo()).reversed())
                 .map(each -> {
                     InvoiceProductDto dto = mapperUtil.convert(each, new InvoiceProductDto());
@@ -50,10 +57,21 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+
+        if (invoiceProductDtoList == null)
+            throw new AccountingProjectException("Invoice Products Not Found");
+
+        return invoiceProductDtoList;
+
     }
 
     @Override
-    public List<InvoiceProduct> findInvoiceProductsByInvoiceType(InvoiceType invoiceType) {
+    public List<InvoiceProduct> findInvoiceProductsByInvoiceType(InvoiceType invoiceType) throws AccountingProjectException {
+
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+
         Company company = mapperUtil.convert(userService.getCurrentUser().getCompany(), new Company());
         return invoiceProductRepository.findAll().stream()
                 .filter(invoiceProduct -> invoiceProduct.getInvoice().getCompany().getTitle().equals(company.getTitle()))
@@ -64,6 +82,14 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public void saveInvoiceProductByInvoiceId(InvoiceProductDto invoiceProductDto, Long invoiceId) throws AccountingProjectException {
+
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+        if (!invoiceService.findById(invoiceId).getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            throw new AccountingProjectException("Invoice Not Found");
+
+
         Invoice invoice = mapperUtil.convert(invoiceService.findById(invoiceId), new Invoice());
         InvoiceProduct invoiceProduct = mapperUtil.convert(invoiceProductDto, new InvoiceProduct());
         invoiceProduct.setInvoice(invoice);
@@ -73,6 +99,12 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public void completeApprovalProcedures(Long invoiceId, InvoiceType type) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+        if (!invoiceService.findById(invoiceId).getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            throw new AccountingProjectException("Invoice Not Found");
+
         List<InvoiceProduct> invoiceProductList = invoiceProductRepository.findAllByInvoice_Id(invoiceId);
         if (type == InvoiceType.SALES) {
             for (InvoiceProduct salesInvoiceProduct : invoiceProductList) {
@@ -82,7 +114,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                     invoiceProductRepository.save(salesInvoiceProduct);
                     setProfitLossOfInvoiceProductsForSalesInvoice(salesInvoiceProduct);
                 } else {
-                    throw new NoSuchElementException("This sale cannot be completed due to insufficient quantity of the product"); // todo custom exception
+                    throw new AccountingProjectException("This sale cannot be completed due to insufficient quantity of the product");
                 }
             }
         } else {
@@ -101,22 +133,44 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public List<InvoiceProduct> findInvoiceProductsByInvoiceTypeAndProductRemainingQuantity(InvoiceType type, Product product, Integer remainingQuantity) {
+    public List<InvoiceProduct> findInvoiceProductsByInvoiceTypeAndProductRemainingQuantity(InvoiceType type, Product product, Integer remainingQuantity) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+
         return invoiceProductRepository.findInvoiceProductsByInvoiceInvoiceTypeAndProductAndRemainingQuantityNotOrderByIdAsc(type, product, remainingQuantity);
     }
 
     @Override
-    public List<InvoiceProduct> findAllInvoiceProductsByProductId(Long id) {
+    public List<InvoiceProduct> findAllInvoiceProductsByProductId(Long id) throws AccountingProjectException {
+
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+
         return invoiceProductRepository.findAllInvoiceProductByProductId(id);
     }
 
     @Override
-    public InvoiceProductDto findById(Long invoiceProductId) {
-        return mapperUtil.convert(invoiceProductRepository.findById(invoiceProductId), new InvoiceProductDto());
+    public InvoiceProductDto findById(Long invoiceProductId) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+
+        InvoiceProduct invoiceProduct = invoiceProductRepository.findById(invoiceProductId).get();
+
+        if (invoiceProduct.getInvoice().getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            throw new AccountingProjectException("Invoice Product Not Found");
+
+
+        return mapperUtil.convert(invoiceProduct, new InvoiceProductDto());
     }
 
     @Override
-    public List<InvoiceProductDto> findAll() {
+    public List<InvoiceProductDto> findAll() throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         Company company = mapperUtil.convert(userService.getCurrentUser().getCompany(), new Company());
         return invoiceProductRepository.findAll().stream()
                 .filter(invoiceProduct -> invoiceProduct.getInvoice().getCompany().getTitle().equals(company.getTitle()))
@@ -125,34 +179,57 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public InvoiceProductDto findByName(String name) {
-        throw new IllegalStateException("NOT IMPLEMENTED");
+    public InvoiceProductDto findByName(String name) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+        throw new AccountingProjectException("FIND_BY_NAME METHOD NOT IMPLEMENTED");
     }
 
     @Override
-    public void save(InvoiceProductDto invoiceProductDto) {
+    public void save(InvoiceProductDto invoiceProductDto) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         invoiceProductRepository.save(mapperUtil.convert(invoiceProductDto, new InvoiceProduct()));
     }
 
-    public void delete(Long invoiceProductId) {
+    public void delete(Long invoiceProductId) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         InvoiceProduct invoiceProduct = invoiceProductRepository.findById(invoiceProductId).get();
+
+        if (invoiceProduct.getInvoice().getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            throw new AccountingProjectException("Invoice Product Not Found");
+
         invoiceProduct.setIsDeleted(true);
         invoiceProductRepository.save(invoiceProduct);
     }
 
     @Override
-    public void update(InvoiceProductDto invoiceProductDto, Long aLong) {
-        throw new IllegalStateException("NOT IMPLEMENTED");
+    public void update(InvoiceProductDto invoiceProductDto, Long aLong) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+
+        throw new AccountingProjectException("UPDATE METHOD NOT IMPLEMENTED");
     }
 
     @Override
-    public boolean isExist(InvoiceProductDto invoiceProductDto, Long invoiceProductId) {
-        throw new IllegalStateException("NOT IMPLEMENTED");
+    public boolean isExist(InvoiceProductDto invoiceProductDto, Long invoiceProductId) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+        throw new AccountingProjectException("DELETE METHOD NOT IMPLEMENTED");
     }
 
     @Override
-    public boolean isExist(InvoiceProductDto invoiceProductDto) {
-        throw new IllegalStateException("NOT IMPLEMENTED");
+    public boolean isExist(InvoiceProductDto invoiceProductDto) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+        throw new AccountingProjectException("IS_EXIST METHOD NOT IMPLEMENTED");
     }
 
 
@@ -166,7 +243,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         productService.update(productDto, productDto.getId());
     }
 
-    private void setProfitLossOfInvoiceProductsForSalesInvoice(InvoiceProduct salesInvoiceProduct) {
+    private void setProfitLossOfInvoiceProductsForSalesInvoice(InvoiceProduct salesInvoiceProduct) throws AccountingProjectException {
         List<InvoiceProduct> availableProductsForSale =
                 findInvoiceProductsByInvoiceTypeAndProductRemainingQuantity(InvoiceType.PURCHASE, salesInvoiceProduct.getProduct(), 0);
         for (InvoiceProduct availableProduct : availableProductsForSale) {
@@ -196,6 +273,13 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                 invoiceProductRepository.save(salesInvoiceProduct);
             }
         }
+    }
+
+
+    private boolean isNotAdminOrManager() {
+        return !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Manager")
+                &&
+                !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Employee");
     }
 
 }

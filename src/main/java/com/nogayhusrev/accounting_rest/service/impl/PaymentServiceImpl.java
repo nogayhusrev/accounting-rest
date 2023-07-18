@@ -5,6 +5,7 @@ import com.nogayhusrev.accounting_rest.dto.PaymentDto;
 import com.nogayhusrev.accounting_rest.entity.Company;
 import com.nogayhusrev.accounting_rest.entity.Payment;
 import com.nogayhusrev.accounting_rest.enums.Months;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.repository.PaymentRepository;
 import com.nogayhusrev.accounting_rest.service.PaymentService;
@@ -33,7 +34,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<PaymentDto> getAllPaymentsByYear(int year) {
+    public List<PaymentDto> getAllPaymentsByYear(int year) throws AccountingProjectException {
+
+        if (isNotAdmin())
+            throw new AccountingProjectException("You Are Not Admin");
+
 
         LocalDate instance = LocalDate.now().withYear(year);
         LocalDate dateStart = instance.with(firstDayOfYear());
@@ -48,7 +53,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void createPaymentsIfNotExist(int year) {
+    public void createPaymentsIfNotExist(int year) throws AccountingProjectException {
+
+        if (isNotAdmin())
+            throw new AccountingProjectException("You Are Not Admin");
+
 
         LocalDate instance = LocalDate.now().withYear(year);
         LocalDate dateStart = instance.with(firstDayOfYear());
@@ -73,17 +82,38 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentDto getPaymentById(Long id) {
+    public PaymentDto getPaymentById(Long id) throws AccountingProjectException {
+        if (isNotAdmin())
+            throw new AccountingProjectException("You Are Not Admin");
+
+
+
         Payment payment = paymentRepository.findById(id).get();
-        return mapperUtil.convert(payment, new PaymentDto());
+
+        if (payment.getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            return mapperUtil.convert(payment, new PaymentDto());
+
+        throw new AccountingProjectException("Payment Not Found");
     }
 
     @Override
-    public PaymentDto payPayment(Long id) {
+    public PaymentDto payPayment(Long id) throws AccountingProjectException {
+        if (isNotAdmin())
+            throw new AccountingProjectException("You Are Not Admin");
+
 
         Payment payment = paymentRepository.findById(id).get();
-        payment.setPaid(true);
-        return mapperUtil.convert(paymentRepository.save(payment), new PaymentDto());
+
+        if (payment.getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle())) {
+            payment.setPaid(true);
+            return mapperUtil.convert(paymentRepository.save(payment), new PaymentDto());
+        }
+
+        throw new AccountingProjectException("Payment Not Found");
+    }
+
+    private boolean isNotAdmin() {
+        return !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Admin");
     }
 
 

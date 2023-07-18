@@ -2,6 +2,7 @@ package com.nogayhusrev.accounting_rest.service.impl;
 
 import com.nogayhusrev.accounting_rest.dto.RoleDto;
 import com.nogayhusrev.accounting_rest.entity.Role;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.repository.RoleRepository;
 import com.nogayhusrev.accounting_rest.service.RoleService;
@@ -26,12 +27,15 @@ public class RoleServiceImpl implements RoleService {
 
 
     @Override
-    public RoleDto findById(Long roleId) {
-        return mapperUtil.convert(roleRepository.findRoleById(roleId), new RoleDto());
+    public RoleDto findById(Long roleId) throws AccountingProjectException {
+        throw new AccountingProjectException("FIND_BY_ID METHOD NOT IMPLEMENTED");
     }
 
     @Override
-    public List<RoleDto> getRolesForCurrentUser() {
+    public List<RoleDto> getRolesForCurrentUser() throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
 
         List<Role> roles;
 
@@ -49,41 +53,48 @@ public class RoleServiceImpl implements RoleService {
 
 
     @Override
-    public List<RoleDto> findAll() {
-        throw new IllegalStateException("Not Implemented");
+    public List<RoleDto> findAll() throws AccountingProjectException {
+        throw new AccountingProjectException("FIND_ALL METHOD NOT IMPLEMENTED");
     }
 
     @Override
-    public RoleDto findByName(String name) {
-        throw new IllegalStateException("NOT IMPLEMENTED");
+    public RoleDto findByName(String name) throws AccountingProjectException {
+        throw new AccountingProjectException("FIND_BY_NAME METHOD NOT IMPLEMENTED");
     }
 
     @Override
-    public void save(RoleDto roleDto) {
-        throw new IllegalStateException("Not Implemented");
-
-    }
-
-    @Override
-    public void delete(Long roleId) {
-        throw new IllegalStateException("Not Implemented");
+    public void save(RoleDto roleDto) throws AccountingProjectException {
+        throw new AccountingProjectException("SAVE METHOD NOT IMPLEMENTED");
 
     }
 
     @Override
-    public void update(RoleDto roleDto, Long roleId) {
-        throw new IllegalStateException("Not Implemented");
+    public void delete(Long roleId) throws AccountingProjectException {
+        throw new AccountingProjectException("DELETE METHOD NOT IMPLEMENTED");
 
     }
 
     @Override
-    public boolean isExist(RoleDto roleDto, Long roleId) {
-        throw new IllegalStateException("NOT IMPLEMENTED");
+    public void update(RoleDto roleDto, Long roleId) throws AccountingProjectException {
+        throw new AccountingProjectException("UPDATE METHOD NOT IMPLEMENTED");
 
     }
 
     @Override
-    public boolean isExist(RoleDto roleDto) {
-        throw new IllegalStateException("NOT IMPLEMENTED");
+    public boolean isExist(RoleDto roleDto, Long roleId) throws AccountingProjectException {
+        throw new AccountingProjectException("IS_EXIST METHOD NOT IMPLEMENTED");
+
     }
+
+    @Override
+    public boolean isExist(RoleDto roleDto) throws AccountingProjectException {
+        throw new AccountingProjectException("IS_EXIST METHOD NOT IMPLEMENTED");
+    }
+
+    private boolean isNotAdminOrManager() {
+        return !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Manager")
+                &&
+                !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Employee");
+    }
+
 }

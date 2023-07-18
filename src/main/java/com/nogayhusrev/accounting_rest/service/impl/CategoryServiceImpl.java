@@ -1,10 +1,8 @@
 package com.nogayhusrev.accounting_rest.service.impl;
 
 import com.nogayhusrev.accounting_rest.dto.CategoryDto;
-import com.nogayhusrev.accounting_rest.dto.UserDto;
 import com.nogayhusrev.accounting_rest.entity.Category;
 import com.nogayhusrev.accounting_rest.entity.Company;
-import com.nogayhusrev.accounting_rest.entity.User;
 import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.mapper.MapperUtil;
 import com.nogayhusrev.accounting_rest.repository.CategoryRepository;
@@ -37,40 +35,45 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto findById(Long categoryId) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
 
         Category category = categoryRepository.findById(categoryId).get();
 
-        if (category.getCompany().getTitle().equals(userService.getCurrentUser().getCompany().getTitle()))
+        if (category.getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
             return mapperUtil.convert(category, new CategoryDto());
 
-        throw new  AccountingProjectException("Category Not Found");
+        throw new AccountingProjectException("Category Not Found");
 
     }
 
     @Override
-    public List<CategoryDto> findAll() {
+    public List<CategoryDto> findAll() throws AccountingProjectException {
+
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         Company company = mapperUtil.convert(userService.getCurrentUser().getCompany(), new Company());
-        return categoryRepository
-                .findAllByCompany(company)
-                .stream()
-                .sorted(Comparator.comparing(Category::getDescription))
-                .map(category -> {
 
-                    CategoryDto categoryDto = mapperUtil.convert(category, new CategoryDto());
-                    try {
-                        if (hasProducts(category))
-                            categoryDto.setHasProduct(true);
-                    } catch (AccountingProjectException e) {
-                        throw new RuntimeException(e);
-                    }
+        return categoryRepository.findAllByCompany(company).stream().sorted(Comparator.comparing(Category::getDescription)).map(category -> {
 
-                    return categoryDto;
+            CategoryDto categoryDto = mapperUtil.convert(category, new CategoryDto());
+            try {
+                if (hasProducts(category)) categoryDto.setHasProduct(true);
+            } catch (AccountingProjectException e) {
+                throw new RuntimeException(e);
+            }
 
-                }).collect(Collectors.toList());
+            return categoryDto;
+
+        }).collect(Collectors.toList());
+
     }
 
     @Override
     public CategoryDto findByName(String name) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
 
         Category category = categoryRepository.findAll().stream()
                 .filter(savedCategory -> savedCategory.getDescription().equalsIgnoreCase(name))
@@ -81,43 +84,63 @@ public class CategoryServiceImpl implements CategoryService {
             throw new AccountingProjectException("Category Not Found");
 
         return mapperUtil.convert(category, new CategoryDto());
+
     }
 
     @Override
-    public void save(CategoryDto categoryDto) {
+    public void save(CategoryDto categoryDto) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         Category category = mapperUtil.convert(categoryDto, new Category());
         Company company = mapperUtil.convert(userService.getCurrentUser().getCompany(), new Company());
         category.setCompany(company);
 
-        categoryRepository.save(category);
+        if (categoryRepository.save(category) == null)
+            throw new AccountingProjectException("Category Not Saved");
+
+
     }
 
     @Override
     public void delete(Long categoryId) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         Category category = categoryRepository.findById(categoryId).get();
 
+        if (!category.getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            throw new AccountingProjectException("Category Not Found");
+
+
         if (hasProducts(category))
-            return;
+            throw new AccountingProjectException("Category Cannot Be Deleted. It Has Products");
 
         category.setIsDeleted(true);
         category.setDescription(category.getDescription() + "_" + category.getId() + "_DELETED");
-        categoryRepository.save(category);
+
+        if (categoryRepository.save(category) == null)
+            throw new AccountingProjectException("Category Cannot Be Deleted");
+
     }
 
-
-    private boolean hasProducts(Category category) throws AccountingProjectException {
-        return productService.findAll().stream()
-                .filter(productDto -> productDto.getCategory().getDescription().equalsIgnoreCase(category.getDescription()))
-                .count() > 0;
-    }
 
     @Override
-    public void update(CategoryDto categoryDto, Long categoryId) {
+    public void update(CategoryDto categoryDto, Long categoryId) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         CategoryDto savedCategory = mapperUtil.convert(categoryRepository.findById(categoryId).get(), new CategoryDto());
+
+        if (!savedCategory.getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            throw new AccountingProjectException("Category Not Found");
 
         categoryDto.setCompany(savedCategory.getCompany());
         categoryDto.setId(categoryId);
-        categoryRepository.save(mapperUtil.convert(categoryDto, new Category()));
+
+        if (categoryRepository.save(mapperUtil.convert(categoryDto, new Category())) == null)
+            throw new AccountingProjectException("Category Not Updated");
+
     }
 
     @Override
@@ -137,6 +160,16 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findAll().stream()
                 .filter(savedCategory -> savedCategory.getDescription().equalsIgnoreCase(categoryDto.getDescription()))
                 .count() > 0;
+    }
+
+    private boolean isNotAdminOrManager() {
+        return !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Manager")
+                &&
+                !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Employee");
+    }
+
+    private boolean hasProducts(Category category) throws AccountingProjectException {
+        return productService.findAll().stream().filter(productDto -> productDto.getCategory().getDescription().equalsIgnoreCase(category.getDescription())).count() > 0;
     }
 
 

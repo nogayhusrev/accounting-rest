@@ -1,8 +1,6 @@
 package com.nogayhusrev.accounting_rest.service.impl;
 
-import com.nogayhusrev.accounting_rest.dto.CategoryDto;
 import com.nogayhusrev.accounting_rest.dto.ClientVendorDto;
-import com.nogayhusrev.accounting_rest.entity.Category;
 import com.nogayhusrev.accounting_rest.entity.ClientVendor;
 import com.nogayhusrev.accounting_rest.entity.Company;
 import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
@@ -32,9 +30,13 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     @Override
     public ClientVendorDto findById(Long clientVendorId) throws AccountingProjectException {
+
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         ClientVendor clientVendor = clientVendorRepository.findById(clientVendorId).get();
 
-        if (clientVendor.getCompany().getTitle().equals(userService.getCurrentUser().getCompany().getTitle()))
+        if (clientVendor.getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
             return mapperUtil.convert(clientVendor, new ClientVendorDto());
 
         throw new AccountingProjectException("ClientVendor Not Found");
@@ -42,7 +44,10 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     }
 
     @Override
-    public List<ClientVendorDto> findAll() {
+    public List<ClientVendorDto> findAll() throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         Company company = mapperUtil.convert(userService.getCurrentUser().getCompany(), new Company());
 
         return clientVendorRepository
@@ -56,27 +61,42 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     @Override
     public ClientVendorDto findByName(String clientVendorName) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         ClientVendor clientVendor = clientVendorRepository.findAll().stream()
                 .filter(savedClientVendor -> savedClientVendor.getClientVendorName().equalsIgnoreCase(clientVendorName))
                 .findFirst().get();
 
-        if (clientVendor == null)
-            throw new AccountingProjectException("Category Not Found");
+        if (clientVendor.getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            return mapperUtil.convert(clientVendor, new ClientVendorDto());
 
-        return mapperUtil.convert(clientVendor, new ClientVendorDto());
+        throw new AccountingProjectException("Client-Vendor Not Found");
+
 
     }
 
     @Override
-    public void save(ClientVendorDto clientVendorDto) {
+    public void save(ClientVendorDto clientVendorDto) throws AccountingProjectException {
+
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
 
         clientVendorDto.setCompany(userService.getCurrentUser().getCompany());
         clientVendorRepository.save(mapperUtil.convert(clientVendorDto, new ClientVendor()));
     }
 
     @Override
-    public void delete(Long clientVendorId) {
+    public void delete(Long clientVendorId) throws AccountingProjectException {
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
         ClientVendor clientVendor = clientVendorRepository.findById(clientVendorId).get();
+
+        if (clientVendor.getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            throw new AccountingProjectException("ClientVendor Not Found");
+
+
         clientVendor.setClientVendorName(clientVendor.getClientVendorName() + "_" + clientVendor.getId() + "_DELETED");
 
         clientVendor.setIsDeleted(true);
@@ -85,7 +105,13 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
 
     @Override
-    public void update(ClientVendorDto clientVendorDto, Long clientVendorId) {
+    public void update(ClientVendorDto clientVendorDto, Long clientVendorId) throws AccountingProjectException {
+
+        if (isNotAdminOrManager())
+            throw new AccountingProjectException("You Are Not Manager Or Employee");
+
+        if (clientVendorDto.getCompany().getTitle().equalsIgnoreCase(userService.getCurrentUser().getCompany().getTitle()))
+            throw new AccountingProjectException("ClientVendor Not Found");
 
 
         clientVendorDto.setId(clientVendorId);
@@ -114,4 +140,12 @@ public class ClientVendorServiceImpl implements ClientVendorService {
                 .filter(savedClientVendor -> savedClientVendor.getClientVendorName().equalsIgnoreCase(clientVendorDto.getClientVendorName()))
                 .count() > 0;
     }
+
+    private boolean isNotAdminOrManager() {
+        return !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Manager")
+                &&
+                !userService.getCurrentUser().getRole().getDescription().equalsIgnoreCase("Employee");
+    }
+
+
 }

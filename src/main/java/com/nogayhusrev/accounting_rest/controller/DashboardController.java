@@ -2,6 +2,7 @@ package com.nogayhusrev.accounting_rest.controller;
 
 
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.service.CompanyService;
 import com.nogayhusrev.accounting_rest.service.DashboardService;
 import com.nogayhusrev.accounting_rest.service.InvoiceService;
@@ -47,7 +48,7 @@ public class DashboardController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> getDashBoard() {
+    public ResponseEntity<ResponseWrapper> getDashBoard() throws AccountingProjectException {
 
         Map<String, Object> map = new HashMap<>();
 

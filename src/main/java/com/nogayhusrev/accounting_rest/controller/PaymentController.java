@@ -3,6 +3,7 @@ package com.nogayhusrev.accounting_rest.controller;
 import com.nogayhusrev.accounting_rest.dto.PaymentDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
 import com.nogayhusrev.accounting_rest.entity.common.ChargeRequest;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.service.PaymentService;
 import com.nogayhusrev.accounting_rest.service.impl.StripeServiceImpl;
 import com.stripe.exception.StripeException;
@@ -47,7 +48,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> list() {
+    public ResponseEntity<ResponseWrapper> list() throws AccountingProjectException {
 
         int year = LocalDate.now().getYear();
 
@@ -69,7 +70,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> list(@PathVariable String year) {
+    public ResponseEntity<ResponseWrapper> list(@PathVariable String year) throws AccountingProjectException {
 
         int selectedYear = (year == null || year.isEmpty()) ? LocalDate.now().getYear() : Integer.parseInt(year);
 
@@ -95,7 +96,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> list(@PathVariable Long paymentId) {
+    public ResponseEntity<ResponseWrapper> list(@PathVariable Long paymentId) throws AccountingProjectException {
 
         PaymentDto payment = paymentService.getPaymentById(paymentId);
 
@@ -122,7 +123,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
     public ResponseEntity<ResponseWrapper> charge(@RequestBody ChargeRequest chargeRequest, @PathVariable Long paymentId)
-            throws StripeException {
+            throws StripeException, AccountingProjectException {
 
         Map<String, Object> map = new HashMap<>();
 

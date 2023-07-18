@@ -57,7 +57,7 @@ public class ReportingController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> getProfitLoss() {
+    public ResponseEntity<ResponseWrapper> getProfitLoss() throws AccountingProjectException {
 
         Map<String, BigDecimal> profitLoss = reportingService.getProfitLoss();
 
