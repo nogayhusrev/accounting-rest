@@ -3,6 +3,7 @@ package com.nogayhusrev.accounting_rest.controller;
 
 import com.nogayhusrev.accounting_rest.dto.ProductDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -37,7 +38,7 @@ public class ProductController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> list() throws Exception {
+    public ResponseEntity<ResponseWrapper> list() throws AccountingProjectException {
         List<ProductDto> productDtoList = productService.findAll();
         return ResponseEntity.ok(new ResponseWrapper("Products are successfully retrieved", productDtoList, HttpStatus.OK));
     }
@@ -51,7 +52,7 @@ public class ProductController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> list(@PathVariable Long productId) throws Exception {
+    public ResponseEntity<ResponseWrapper> list(@PathVariable Long productId) throws AccountingProjectException {
         ProductDto productDto = productService.findById(productId);
         return ResponseEntity.ok(new ResponseWrapper("Product successfully retrieved", productDto, HttpStatus.OK));
     }
@@ -66,10 +67,10 @@ public class ProductController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> create(@RequestBody ProductDto productDto) throws Exception {
+    public ResponseEntity<ResponseWrapper> create(@RequestBody ProductDto productDto) throws AccountingProjectException {
 
         if (productService.isExist(productDto)) {
-            throw new Exception("This Product description already exists");
+            throw new AccountingProjectException("This Product description already exists");
         }
 
         productService.save(productDto);
@@ -88,10 +89,10 @@ public class ProductController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> update(@RequestBody ProductDto productDto, @PathVariable Long productId) throws Exception {
+    public ResponseEntity<ResponseWrapper> update(@RequestBody ProductDto productDto, @PathVariable Long productId) throws AccountingProjectException {
 
         if (productService.isExist(productDto, productId)) {
-            throw new Exception("This Product description already exists");
+            throw new AccountingProjectException("This Product description already exists");
         }
 
         productService.update(productDto, productId);
@@ -109,10 +110,10 @@ public class ProductController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long productId) throws Exception {
+    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long productId) throws AccountingProjectException {
 
         if (productService.findById(productId).getQuantityInStock() > 0) {
-            throw new Exception("This Products has quantity in stock.");
+            throw new AccountingProjectException("This Products has quantity in stock.");
         }
 
         productService.delete(productId);

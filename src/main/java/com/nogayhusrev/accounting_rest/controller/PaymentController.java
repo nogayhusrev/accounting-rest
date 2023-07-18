@@ -75,7 +75,7 @@ public class PaymentController {
         int selectedYear = (year == null || year.isEmpty()) ? LocalDate.now().getYear() : Integer.parseInt(year);
 
         if (selectedYear < 2000 || selectedYear > 2100)
-            throw new IllegalStateException("********* ====>>> YEAR NOT VALID <<<==== ********* ");
+            throw new AccountingProjectException("********* ====>>> YEAR NOT VALID <<<==== ********* ");
 
         paymentService.createPaymentsIfNotExist(selectedYear);
 

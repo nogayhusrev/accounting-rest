@@ -3,6 +3,7 @@ package com.nogayhusrev.accounting_rest.controller;
 
 import com.nogayhusrev.accounting_rest.dto.ClientVendorDto;
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.service.AddressService;
 import com.nogayhusrev.accounting_rest.service.ClientVendorService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +41,7 @@ public class ClientVendorController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> list() throws Exception {
+    public ResponseEntity<ResponseWrapper> list() throws AccountingProjectException {
 
         List<ClientVendorDto> clientVendorDtoList = clientVendorService.findAll();
         return ResponseEntity.ok(new ResponseWrapper("Client-Vendors are successfully retrieved", clientVendorDtoList, HttpStatus.OK));
@@ -55,7 +56,7 @@ public class ClientVendorController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> list(@PathVariable Long clientVendorId) throws Exception {
+    public ResponseEntity<ResponseWrapper> list(@PathVariable Long clientVendorId) throws AccountingProjectException {
         ClientVendorDto clientVendorDto = clientVendorService.findById(clientVendorId);
         return ResponseEntity.ok(new ResponseWrapper("Client-Vendor successfully retrieved", clientVendorDto, HttpStatus.OK));
     }
@@ -70,10 +71,10 @@ public class ClientVendorController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> create(@RequestBody ClientVendorDto clientVendorDto) throws Exception {
+    public ResponseEntity<ResponseWrapper> create(@RequestBody ClientVendorDto clientVendorDto) throws AccountingProjectException {
 
         if (clientVendorService.isExist(clientVendorDto)) {
-            throw new Exception("This Client-Vendor name already exists");
+            throw new AccountingProjectException("This Client-Vendor name already exists");
         }
 
         clientVendorService.save(clientVendorDto);
@@ -91,11 +92,11 @@ public class ClientVendorController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> update(@RequestBody ClientVendorDto clientVendorDto, @PathVariable Long clientVendorId) throws Exception {
+    public ResponseEntity<ResponseWrapper> update(@RequestBody ClientVendorDto clientVendorDto, @PathVariable Long clientVendorId) throws AccountingProjectException {
 
 
         if (clientVendorService.isExist(clientVendorDto, clientVendorId)) {
-            throw new Exception("This Client-Vendor name already exists");
+            throw new AccountingProjectException("This Client-Vendor name already exists");
         }
 
         clientVendorService.update(clientVendorDto, clientVendorId);
@@ -113,7 +114,7 @@ public class ClientVendorController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long clientVendorId) throws Exception {
+    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long clientVendorId) throws AccountingProjectException {
 
 
         clientVendorService.delete(clientVendorId);

@@ -39,7 +39,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> list() throws Exception {
+    public ResponseEntity<ResponseWrapper> list() throws AccountingProjectException {
         List<CategoryDto> categoryList = categoryService.findAll();
         return ResponseEntity.ok(new ResponseWrapper("Categories are successfully retrieved", categoryList, HttpStatus.OK));
     }
@@ -53,7 +53,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> list(@PathVariable Long categoryId) throws Exception {
+    public ResponseEntity<ResponseWrapper> list(@PathVariable Long categoryId) throws AccountingProjectException {
         CategoryDto categoryDto = categoryService.findById(categoryId);
         return ResponseEntity.ok(new ResponseWrapper("Category successfully retrieved", categoryDto, HttpStatus.OK));
     }

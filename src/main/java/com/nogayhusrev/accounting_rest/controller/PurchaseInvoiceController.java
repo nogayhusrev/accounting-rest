@@ -50,7 +50,7 @@ public class PurchaseInvoiceController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> list() throws Exception {
+    public ResponseEntity<ResponseWrapper> list() throws AccountingProjectException {
 
         List<InvoiceDto> purchaseInvoices = invoiceService.findPurchaseInvoices();
         return ResponseEntity.ok(new ResponseWrapper("Purchase Invoices are successfully retrieved", purchaseInvoices, HttpStatus.OK));
@@ -81,10 +81,10 @@ public class PurchaseInvoiceController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> create(@RequestBody InvoiceDto invoiceDto) throws Exception {
+    public ResponseEntity<ResponseWrapper> create(@RequestBody InvoiceDto invoiceDto) throws AccountingProjectException {
 
         if (invoiceService.isExist(invoiceDto)) {
-            throw new Exception("This Invoice No already exists");
+            throw new AccountingProjectException("This Invoice No already exists");
         }
 
         invoiceDto.setInvoiceNo(invoiceService.generateInvoiceNo(InvoiceType.PURCHASE));
@@ -103,11 +103,11 @@ public class PurchaseInvoiceController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> update(@RequestBody InvoiceDto invoiceDto, @PathVariable Long purchaseInvoiceId) throws Exception {
+    public ResponseEntity<ResponseWrapper> update(@RequestBody InvoiceDto invoiceDto, @PathVariable Long purchaseInvoiceId) throws AccountingProjectException {
 
 
         if (invoiceService.isExist(invoiceDto, purchaseInvoiceId)) {
-            throw new Exception("This Purchase Invoice no already exists");
+            throw new AccountingProjectException("This Purchase Invoice no already exists");
         }
 
         invoiceService.update(invoiceDto, purchaseInvoiceId);

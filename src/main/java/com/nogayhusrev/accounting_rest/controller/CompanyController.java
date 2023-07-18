@@ -45,7 +45,7 @@ public class CompanyController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> list() throws Exception {
+    public ResponseEntity<ResponseWrapper> list() throws AccountingProjectException {
         List<CompanyDto> companyDtoList = companyService.findAll();
         return ResponseEntity.ok(new ResponseWrapper("Companies are successfully retrieved", companyDtoList, HttpStatus.OK));
     }
@@ -59,7 +59,7 @@ public class CompanyController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> list(@PathVariable Long companyId) throws Exception {
+    public ResponseEntity<ResponseWrapper> list(@PathVariable Long companyId) throws AccountingProjectException {
         CompanyDto companyDto = companyService.findById(companyId);
         return ResponseEntity.ok(new ResponseWrapper("Company successfully retrieved", companyDto, HttpStatus.OK));
     }
@@ -74,10 +74,10 @@ public class CompanyController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> create(@RequestBody CompanyDto companyDto) throws Exception {
+    public ResponseEntity<ResponseWrapper> create(@RequestBody CompanyDto companyDto) throws AccountingProjectException {
 
         if (companyService.isExist(companyDto)) {
-            throw new Exception("This Company title already exists");
+            throw new AccountingProjectException("This Company title already exists");
         }
 
         companyService.save(companyDto);
@@ -94,11 +94,11 @@ public class CompanyController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> update(@RequestBody CompanyDto companyDto, @PathVariable Long companyId) throws Exception {
+    public ResponseEntity<ResponseWrapper> update(@RequestBody CompanyDto companyDto, @PathVariable Long companyId) throws AccountingProjectException {
 
 
         if (companyService.isExist(companyDto, companyId)) {
-            throw new Exception("This Company title already exists");
+            throw new AccountingProjectException("This Company title already exists");
         }
 
         companyService.update(companyDto, companyId);

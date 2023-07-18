@@ -3,6 +3,7 @@ package com.nogayhusrev.accounting_rest.controller;
 
 import com.nogayhusrev.accounting_rest.dto.ResponseWrapper;
 import com.nogayhusrev.accounting_rest.dto.UserDto;
+import com.nogayhusrev.accounting_rest.exception.AccountingProjectException;
 import com.nogayhusrev.accounting_rest.service.CompanyService;
 import com.nogayhusrev.accounting_rest.service.RoleService;
 import com.nogayhusrev.accounting_rest.service.UserService;
@@ -44,7 +45,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> list() throws Exception {
+    public ResponseEntity<ResponseWrapper> list() throws AccountingProjectException {
         List<UserDto> userDtoList = userService.findAll();
         return ResponseEntity.ok(new ResponseWrapper("Users are successfully retrieved", userDtoList, HttpStatus.OK));
     }
@@ -58,7 +59,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> list(@PathVariable Long userId) throws Exception {
+    public ResponseEntity<ResponseWrapper> list(@PathVariable Long userId) throws AccountingProjectException {
         UserDto userDto = userService.findById(userId);
         return ResponseEntity.ok(new ResponseWrapper("User successfully retrieved", userDto, HttpStatus.OK));
     }
@@ -73,10 +74,10 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> create(@RequestBody UserDto userDto) throws Exception {
+    public ResponseEntity<ResponseWrapper> create(@RequestBody UserDto userDto) throws AccountingProjectException {
 
         if (userService.isExist(userDto)) {
-            throw new Exception("This username already exists");
+            throw new AccountingProjectException("This username already exists");
         }
 
         userService.save(userDto);
@@ -95,10 +96,10 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> update(@RequestBody UserDto userDto, @PathVariable Long userId) throws Exception {
+    public ResponseEntity<ResponseWrapper> update(@RequestBody UserDto userDto, @PathVariable Long userId) throws AccountingProjectException {
 
         if (userService.isExist(userDto, userId)) {
-            throw new Exception("This Product description already exists");
+            throw new AccountingProjectException("This Product description already exists");
         }
 
         userService.update(userDto, userId);
@@ -116,7 +117,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     })
-    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long userId) throws Exception {
+    public ResponseEntity<ResponseWrapper> delete(@PathVariable Long userId) throws AccountingProjectException {
 
         userService.delete(userId);
 
